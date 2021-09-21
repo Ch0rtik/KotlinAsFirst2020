@@ -5,6 +5,7 @@ package lesson1.task1
 import java.lang.Math.pow
 import java.lang.Math.sqrt
 import kotlin.math.PI
+import kotlin.math.abs
 import kotlin.math.pow
 
 // Урок 1: простые функции
@@ -116,10 +117,10 @@ fun angleInRadian(deg: Int, min: Int, sec: Int): Double {
 fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double {
     // Треугольник. Теор Пифагора
 
-    val x = Math.abs(x1 - x2)
-    val y = Math.abs(y1 - y2)
+    val x = abs(x1 - x2)
+    val y = abs(y1 - y2)
 
-    return Math.sqrt((x * x) + (y * y))
+    return sqrt((x * x) + (y * y))
 }
 
 /**
@@ -128,23 +129,7 @@ fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double {
  * Пользователь задает целое число, большее 100 (например, 3801).
  * Определить третью цифру справа в этом числе (в данном случае 8).
  */
-fun thirdDigit(number: Int): Int {
-    var x = number
-    var result = 0
-
-    var count = 0
-    while (x > 0) {
-
-        count++
-
-        if (count == 3) {
-            result = x % 10
-        }
-        x /= 10
-    }
-
-    return result
-}
+fun thirdDigit(number: Int): Int = (number / 100) % 10
 
 /**
  * Простая (2 балла)
@@ -169,10 +154,16 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
  */
 fun accountInThreeYears(initial: Int, percent: Int): Double {
     var result = initial.toDouble()
+    val p = percent / 100.0
+    result += result * p
+    result += result * p
+    result += result * p
 
+/*
     for (i in 0..2) {
         result += result * percent / 100.0
     }
+*/
     return result
 }
 
@@ -182,20 +173,4 @@ fun accountInThreeYears(initial: Int, percent: Int): Double {
  * Пользователь задает целое трехзначное число (например, 478).
  * Необходимо вывести число, полученное из заданного перестановкой цифр в обратном порядке (например, 874).
  */
-fun numberRevert(number: Int): Int {
-    var ints = mutableListOf<Int>()
-
-    var x = number
-
-    while (x > 0) {
-        ints.add(x % 10)
-        x /= 10
-    }
-
-    ints = ints.reversed() as MutableList<Int>
-    var result = 0
-    for (i in 0 until ints.size) {
-        result += (ints[i] * 10.0.pow(i)).toInt()
-    }
-    return result
-}
+fun numberRevert(number: Int): Int = number.toString().reversed().toInt()
