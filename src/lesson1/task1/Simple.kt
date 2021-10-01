@@ -163,4 +163,25 @@ fun accountInThreeYears(initial: Int, percent: Int): Double {
  * Пользователь задает целое трехзначное число (например, 478).
  * Необходимо вывести число, полученное из заданного перестановкой цифр в обратном порядке (например, 874).
  */
-fun numberRevert(number: Int): Int = number.toString().reversed().toInt()
+fun numberRevert(number: Int): Int {
+    // Вернул изначальный вариант, хочу его преиспользовать в Lesson.Loop в revert()
+    val ints = getNumberList(number)
+
+    var result = 0
+    for (i in 0 until ints.size) {
+        result += ints[i] * 10.0.pow(i).toInt()
+    }
+    return result
+}
+
+fun getNumberList(number: Int): MutableList<Int> {
+    // Вернул изначальный вариант, хочу его преиспользовать в Lesson.Logical isHappyNumber
+    val ints = mutableListOf<Int>()
+    var x = number
+
+    while (x > 0) {
+        ints.add(x % 10)
+        x /= 10
+    }
+    return ints.asReversed()
+}

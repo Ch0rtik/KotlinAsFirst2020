@@ -154,19 +154,16 @@ fun whichRookThreatens(
     }
 }
 
-private enum class TypeFigure {
+enum class TypeFigure {
     // Я понимаю, что это малость я ухожу вперед и можно было ограничиться только String, но это решение мне показалось более удобным
-    BISHOP,
-    ROOK
+    BISHOP, ROOK, QUEEN
 }
 
-private fun inControlCells(
+fun inControlCells(
     currentFigureType: TypeFigure, currentFigureX: Int, currentFigureY: Int,
     otherFigureX: Int, otherFigureY: Int
 ): Boolean {
     var result = false
-    val xMax = 8 // нумерация с 1
-    val yMax = 8
 
     // Нужно сделать эффективной по памяти и времени O(n)...
     when (currentFigureType) {
@@ -175,32 +172,60 @@ private fun inControlCells(
             // Чтобы опр. диагональ достаточно найти 1 из крайних клеток этой диагонали,
             // а затем определить, такая же крайняя клетка ли у диагонали otherFigure
 
-            result = (currentFigureX + currentFigureY) == (otherFigureX + otherFigureY)
-            if (!result) {
-                val maxDiagonalX: Int
-                val maxDiagonalY: Int
-                //Ищу крайнюю справа
-                //Для текущей фигуры
-                var delta = min(xMax - currentFigureX, yMax - currentFigureY)
-
-                maxDiagonalX = currentFigureX + delta
-                maxDiagonalY = currentFigureY + delta
-
-                // Для иной
-                delta = min(xMax - otherFigureX, yMax - otherFigureY)
-                result = (maxDiagonalX == otherFigureX + delta) && (maxDiagonalY == otherFigureY + delta)
-            }
+            result = inBishopControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
         }
         TypeFigure.ROOK -> {
-            result = currentFigureX == otherFigureX || currentFigureY == otherFigureY
+            result = inRookControlCells(currentFigureX, otherFigureX, currentFigureY, otherFigureY)
+        }
+
+        TypeFigure.QUEEN -> {
+            result = inRookControlCells(currentFigureX, otherFigureX, currentFigureY, otherFigureY)
+            if (!result) {
+                result = inBishopControlCells(currentFigureX, otherFigureX, currentFigureY, otherFigureY)
+            }
         }
         // Может по приколу сделать для ферзя, короля, коня и пешки?
-        // Ферзь, очевидно, объединяет логику слона и ладьи, потому по-хорошему вынести бы их логику в отдельный метод
+        // Ферзь, очевидно, объединяет логику слона и ладьи, потому по-хорошему вынести бы их логику в отдельные методы
         // у короля модуль разности для x'ов и y'ов не должен превышать 1
         // пешка - слон на миниалках, y += 1(или -= 1 для черного цвета, т.е необходим еще аргумент цвета фигуры), а x +=1 и x-=1. А так же проверка на выход за пределы доски
         // конь - в процессе, но напоминает пешку
     }
 
+    return result
+}
+
+private fun inRookControlCells(
+    currentFigureX: Int,
+    otherFigureX: Int,
+    currentFigureY: Int,
+    otherFigureY: Int
+) = currentFigureX == otherFigureX || currentFigureY == otherFigureY
+
+private fun inBishopControlCells(
+    currentFigureX: Int,
+    currentFigureY: Int,
+    otherFigureX: Int,
+    otherFigureY: Int
+): Boolean {
+    var result = (currentFigureX + currentFigureY) == (otherFigureX + otherFigureY)
+
+    if (!result) {
+        val xMax = 8 // нумерация с 1
+        val yMax = 8
+
+        val maxDiagonalX: Int
+        val maxDiagonalY: Int
+        //Ищу крайнюю справа
+        //Для текущей фигуры
+        var delta = min(xMax - currentFigureX, yMax - currentFigureY)
+
+        maxDiagonalX = currentFigureX + delta
+        maxDiagonalY = currentFigureY + delta
+
+        // Для иной
+        delta = min(xMax - otherFigureX, yMax - otherFigureY)
+        result = (maxDiagonalX == otherFigureX + delta) && (maxDiagonalY == otherFigureY + delta)
+    }
     return result
 }
 
