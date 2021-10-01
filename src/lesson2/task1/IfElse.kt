@@ -4,6 +4,8 @@ package lesson2.task1
 
 import lesson1.task1.discriminant
 import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 // Урок 2: ветвления (здесь), логический тип (см. 2.2).
@@ -130,7 +132,77 @@ fun whichRookThreatens(
     kingX: Int, kingY: Int,
     rookX1: Int, rookY1: Int,
     rookX2: Int, rookY2: Int
-): Int = TODO()
+): Int {
+    // 1) Значит, теоретически я должен определить поля подконтрольные каждой фигуре (тут двум ладьям)
+    // 2) Как это сделать?
+    // 3) Хммм, а можно использовать массивы, списки?
+    // 4) Какое самое универсальное и в тоже время самое простое решение?
+    // Пусть у меня будет метод (inControlCells()), который на вход принимает 3 аргумента: тип фигуры, x, y.
+    // 1. Тогда вернуть этот метод должен массив клеток которые находятся под контролем фигуры,
+    // после этого можно проверить находится ли третья фигура в этой зоне (хотя на пути может встретится другая фигура, но тут это не учитывается)
+    // Но так как мы не изучали еще списки (да и не факт, что это эффеткивано), то будет еще 2 ургумента: x, y сторонней фигуры, и метод будет возвращать true
+    // если клетка будет найдена в процессе работы inControlCells
+
+    val inControlRook1 = inControlCells(TypeFigure.ROOK, rookX1, rookY1, kingX, kingY)
+    val inControlRook2 = inControlCells(TypeFigure.ROOK, rookX2, rookY2, kingX, kingY)
+
+    return when {
+        inControlRook1 && inControlRook2 -> 3
+        inControlRook2 -> 2
+        inControlRook1 -> 1
+        else -> 0
+    }
+}
+
+private enum class TypeFigure {
+    // Я понимаю, что это малость я ухожу вперед и можно было ограничиться только String, но это решение мне показалось более удобным
+    BISHOP,
+    ROOK
+}
+
+private fun inControlCells(
+    currentFigureType: TypeFigure, currentFigureX: Int, currentFigureY: Int,
+    otherFigureX: Int, otherFigureY: Int
+): Boolean {
+    var result = false
+    val xMax = 8 // нумерация с 1
+    val yMax = 8
+
+    // Нужно сделать эффективной по памяти и времени O(n)...
+    when (currentFigureType) {
+        TypeFigure.BISHOP -> {
+            // Если диагональ слева на право, то сумма x и y увел. на 2, иначе == тому же знач.
+            // Чтобы опр. диагональ достаточно найти 1 из крайних клеток этой диагонали,
+            // а затем определить, такая же крайняя клетка ли у диагонали otherFigure
+
+            result = (currentFigureX + currentFigureY) == (otherFigureX + otherFigureY)
+            if (!result) {
+                val maxDiagonalX: Int
+                val maxDiagonalY: Int
+                //Ищу крайнюю справа
+                //Для текущей фигуры
+                var delta = min(xMax - currentFigureX, yMax - currentFigureY)
+
+                maxDiagonalX = currentFigureX + delta
+                maxDiagonalY = currentFigureY + delta
+
+                // Для иной
+                delta = min(xMax - otherFigureX, yMax - otherFigureY)
+                result = (maxDiagonalX == otherFigureX + delta) && (maxDiagonalY == otherFigureY + delta)
+            }
+        }
+        TypeFigure.ROOK -> {
+            result = currentFigureX == otherFigureX || currentFigureY == otherFigureY
+        }
+        // Может по приколу сделать для ферзя, короля, коня и пешки?
+        // Ферзь, очевидно, объединяет логику слона и ладьи, потому по-хорошему вынести бы их логику в отдельный метод
+        // у короля модуль разности для x'ов и y'ов не должен превышать 1
+        // пешка - слон на миниалках, y += 1(или -= 1 для черного цвета, т.е необходим еще аргумент цвета фигуры), а x +=1 и x-=1. А так же проверка на выход за пределы доски
+        // конь - в процессе, но напоминает пешку
+    }
+
+    return result
+}
 
 /**
  * Простая (2 балла)
@@ -146,7 +218,18 @@ fun rookOrBishopThreatens(
     kingX: Int, kingY: Int,
     rookX: Int, rookY: Int,
     bishopX: Int, bishopY: Int
-): Int = TODO()
+): Int {
+
+    val inControlRook = inControlCells(TypeFigure.ROOK, rookX, rookY, kingX, kingY)
+    val inControlBishop = inControlCells(TypeFigure.BISHOP, bishopX, bishopY, kingX, kingY)
+
+    return when {
+        inControlRook && inControlBishop -> 3
+        inControlBishop -> 2
+        inControlRook -> 1
+        else -> 0
+    }
+}
 
 /**
  * Простая (2 балла)
@@ -156,7 +239,19 @@ fun rookOrBishopThreatens(
  * прямоугольным (вернуть 1) или тупоугольным (вернуть 2).
  * Если такой треугольник не существует, вернуть -1.
  */
-fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
+fun triangleKind(a: Double, b: Double, c: Double): Int {
+    val side1 = min(a, b) // Первая наименьшая сторона - "катет"
+    val side2 = min(c, max(a, b)) // Вторая наименьшая сторона - "катет"
+    val side3 = max(c, max(a, b)) // Наибольшая сторона - "гипотенуза"
+
+    val sum = side1.pow(2) + side2.pow(2)
+    return when {
+        side1 + side2 < side3 -> -1
+        sum > side3.pow(2) -> 0
+        sum == side3.pow(2) -> 1
+        else -> 2
+    }
+}
 
 /**
  * Средняя (3 балла)
@@ -166,4 +261,14 @@ fun triangleKind(a: Double, b: Double, c: Double): Int = TODO()
  * Найти длину пересечения отрезков AB и CD.
  * Если пересечения нет, вернуть -1.
  */
-fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int = TODO()
+fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
+    val endFirst = min(b, d)
+    val startOther = max(a, c)
+    // Конец первого меньше начала второго
+
+    return if (endFirst >= startOther) {
+        endFirst - startOther
+    } else {
+        -1
+    }
+}
