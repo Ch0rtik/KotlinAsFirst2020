@@ -6,6 +6,8 @@ import lesson1.task1.getNumberList
 import lesson1.task1.sqr
 import lesson2.task1.TypeFigure
 import lesson2.task1.inControlCells
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -95,14 +97,18 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    val sides = mutableListOf(a, b, c)
+    val sides : MutableList<Int> = mutableListOf()
+    sides.addAll(0, listOf(a, b, c).sorted())
+
     var b1 = false
     var b2 = false
 
+    val minSide = min(r, s)
+    val maxSide = max(r, s)
     var usedSide = -1
     for (i in sides) {
-        if (i <= r) {
-            usedSide = 1
+        if (i <= minSide) {
+            usedSide = i
             b1 = true
             break
         }
@@ -111,7 +117,7 @@ fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
 
         sides.remove(usedSide)
         for (i in sides) {
-            if (i <= s) {
+            if (i <= maxSide) {
                 b2 = true
                 break
             }

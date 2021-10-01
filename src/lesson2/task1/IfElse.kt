@@ -175,13 +175,13 @@ fun inControlCells(
             result = inBishopControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
         }
         TypeFigure.ROOK -> {
-            result = inRookControlCells(currentFigureX, otherFigureX, currentFigureY, otherFigureY)
+            result = inRookControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
         }
 
         TypeFigure.QUEEN -> {
-            result = inRookControlCells(currentFigureX, otherFigureX, currentFigureY, otherFigureY)
+            result = inRookControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
             if (!result) {
-                result = inBishopControlCells(currentFigureX, otherFigureX, currentFigureY, otherFigureY)
+                result = inBishopControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
             }
         }
         // Может по приколу сделать для ферзя, короля, коня и пешки?
@@ -196,8 +196,8 @@ fun inControlCells(
 
 private fun inRookControlCells(
     currentFigureX: Int,
-    otherFigureX: Int,
     currentFigureY: Int,
+    otherFigureX: Int,
     otherFigureY: Int
 ) = currentFigureX == otherFigureX || currentFigureY == otherFigureY
 
