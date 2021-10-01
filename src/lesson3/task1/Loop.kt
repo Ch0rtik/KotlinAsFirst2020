@@ -2,6 +2,7 @@
 
 package lesson3.task1
 
+import lesson1.task1.numberRevert
 import kotlin.math.sqrt
 
 // Урок 3: циклы
@@ -138,7 +139,7 @@ fun isCoPrime(m: Int, n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun revert(n: Int): Int = TODO()
+fun revert(n: Int): Int = numberRevert(n) // Фунция с первого Lesson
 
 /**
  * Средняя (3 балла)
