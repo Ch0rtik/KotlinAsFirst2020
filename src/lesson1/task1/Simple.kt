@@ -175,7 +175,7 @@ fun numberRevert(number: Int): Int {
 }
 
 fun getNumberList(number: Int): MutableList<Int> {
-    // Вернул изначальный вариант, хочу его преиспользовать в Lesson.Logical isHappyNumber
+    // Вернул изначальный вариант, хочу его преиспользовать в Lesson.Logical isHappyNumber и др.
     val ints = mutableListOf<Int>()
     var x = number
 

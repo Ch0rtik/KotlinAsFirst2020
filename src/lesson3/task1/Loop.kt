@@ -2,6 +2,7 @@
 
 package lesson3.task1
 
+import lesson1.task1.getNumberList
 import lesson1.task1.numberRevert
 import kotlin.math.sqrt
 
@@ -73,7 +74,15 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun digitNumber(n: Int): Int = TODO()
+fun digitNumber(n: Int): Int {
+    var count = 0
+    var x = n
+    while (x > 0) {
+        x /= 10
+        count++
+    }
+    return count
+}
 
 /**
  * Простая (2 балла)
@@ -81,21 +90,55 @@ fun digitNumber(n: Int): Int = TODO()
  * Найти число Фибоначчи из ряда 1, 1, 2, 3, 5, 8, 13, 21, ... с номером n.
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
-fun fib(n: Int): Int = TODO()
+fun fib(n: Int): Int = TODO() /*{
+    var previous = 0
+    var current = 1
+    var result = 1
+
+    for (i in 1..n) {
+        result = previous + current
+        current++
+        previous = current
+    }
+    return result
+}*/
 
 /**
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
-fun minDivisor(n: Int): Int = TODO()
+fun minDivisor(n: Int): Int {
+    val mid = n / 2
+    var result = n // на тот случай, если число простое
+
+    for (i in 2..mid) {
+        if (n % i == 0) {
+            result = i
+            break
+        }
+    }
+    return result
+}
 
 /**
  * Простая (2 балла)
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int = TODO()
+fun maxDivisor(n: Int): Int {
+    val mid = n / 2
+    var result = 1 // на тот случай, если число простое
+    // В задании указано "n > 1", однако в тестах используется 1 для проверки ожидаемого рез-та
+    // Поэтому я преположил, что там опечатка и должно быть "n >= 1"
+    for (i in mid downTo 2) {
+        if (n % i == 0) {
+            result = i
+            break
+        }
+    }
+    return result
+}
 
 /**
  * Простая (2 балла)
@@ -150,7 +193,25 @@ fun revert(n: Int): Int = numberRevert(n) // Фунция с первого Less
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = TODO()
+fun isPalindrome(n: Int): Boolean {
+    val numbers = getNumberList(n)
+    var result = true
+    // логика в том, что я одновремено иду с начала и с конца, проверя тамошние знач.
+    val mid = numbers.size / 2
+    var first: Int
+    var end: Int
+
+    for (i in 0..mid) {
+        first = numbers[i]
+        end = numbers[numbers.size - (i + 1)]
+        if (first != end) {
+            result = false
+            break
+        }
+    }
+
+    return result
+}
 
 /**
  * Средняя (3 балла)
@@ -160,7 +221,23 @@ fun isPalindrome(n: Int): Boolean = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun hasDifferentDigits(n: Int): Boolean = TODO()
+fun hasDifferentDigits(n: Int): Boolean {
+    val numbers = getNumberList(n)
+    var previous = -1
+    var result = false
+
+    for (i in numbers) {
+        if (previous == -1) {
+            previous = i
+            continue
+        }
+        if (i != previous) {
+            result = true
+            break
+        }
+    }
+    return result
+}
 
 /**
  * Средняя (4 балла)
