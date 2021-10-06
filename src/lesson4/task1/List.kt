@@ -3,6 +3,7 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
+import lesson1.task1.getNumberList
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -268,4 +269,135 @@ fun roman(n: Int): String = TODO()
  * Например, 375 = "триста семьдесят пять",
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
-fun russian(n: Int): String = TODO()
+fun russian(n: Int): String {
+    val numbers = getNumberList(n)
+    val nameTriple = RussianNumbers.nameTriple // Знаю, что миллион не понадобится.
+    // Разрабатываю логику с возможность масштабирования
+    val units = RussianNumbers.units
+    val tens = RussianNumbers.tens
+    val hundreds = RussianNumbers.hundreds
+
+    val results = mutableListOf<String>()
+
+    var countTriple = 0
+
+    var currentList: MutableList<String>
+
+    for (i in numbers.size - 1 downTo 0) {
+        val currentTriple = ((numbers.size - 1) - i) / 3
+        if (currentTriple != countTriple) {
+            countTriple = currentTriple
+
+            if (countTriple < nameTriple.size) {
+                // Добавляет "тысяча", "миллион" и т.д.
+                val ten = if (numbers.size < i + 1) numbers[i + 1] else 0
+                results.add(RussianNumbers.renameFromCount(numbers[i] + ten * 10, nameTriple[countTriple]))
+            }
+        }
+
+        // Если число > 10 and < 20, то когда его заменять? -> На момент, когда обрабатываю десятки
+        currentList = when (((numbers.size - 1) - i) % 3) {
+            0 -> units
+            1 -> tens
+            else -> hundreds
+        }
+        if (i % 3 == 1 && numbers[i] == 1) {
+            // если число >= 10 and < 20
+            results[i - 1] = RussianNumbers.getExceptionYears(10 + numbers[i + 1]) // TODO renameEnding
+        } else {
+            results.add(currentList[numbers[i]])
+        }
+    }
+
+    return buildString {
+        for (i in results.size - 1 downTo 0) {
+            if (results[i].isNotEmpty()) {
+                append(results[i])
+                if (i != 0) append(" ")
+            }
+        }
+    }
+}
+
+class RussianNumbers {
+    companion object {
+        val nameTriple = mutableListOf("", "тысяча", "миллион") // Знаю, что миллион не понадобится.
+
+        // Разрабатываю логику с возможность масштабирования
+        val units = mutableListOf("", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+        val tens = mutableListOf(
+            "",
+            "десять",
+            "двадцать",
+            "тридцать",
+            "сорок",
+            "пятьдесят",
+            "шестьдесят",
+            "семьдесят",
+            "восемьмьдесят",
+            "девяносто"
+        )
+        val hundreds = mutableListOf(
+            "",
+            "сто",
+            "двести",
+            "триста",
+            "четыреста",
+            "пятьсот",
+            "шестьсот",
+            "семьсот",
+            "восемьсот",
+            "девятьсот"
+        )
+
+        fun renameFromCount(n: Int, name: String): String {
+            return when (n) {
+                1 -> name
+                in 2..4 -> name.dropLast(1) + getEnding(n, name)
+                else -> {
+                    val end = getEnding(n, name)
+                    if (end.isEmpty()) {
+                        name.dropLast(1)
+                    } else {
+                        name + end
+                    }
+                }
+            }
+        }
+
+        private fun getEnding(n: Int, name: String): String {
+            // TODO написать метод изменения окончаний для большинства слов
+            //тысяча ,миллион ,биллион (миллиард)[3] ,триллион ,квадриллион ,квинтиллион ,секстиллион ,септиллион ,октиллион ,нониллион ,дециллион ,ундециллион
+            val lastChar = name[name.length - 1]
+
+            return if (lastChar == 'а') {
+                when (n) {
+                    in 2..4 -> "и"
+                    else -> ""
+                }
+            } else {
+                when (n) {
+                    in 2..4 -> "а"
+                    else -> "ов"
+                }
+            }
+        }
+
+        fun getExceptionYears(n: Int): String {
+            return when (n) {
+                10 -> "десять"
+                11 -> "одинадцать"
+                12 -> "десять"
+                13 -> "десять"
+                14 -> "десять"
+                15 -> "десять"
+                16 -> "десять"
+                17 -> "десять"
+                18 -> "десять"
+                19 -> "десять"
+                else -> ""
+            }
+        }
+
+    }
+}
