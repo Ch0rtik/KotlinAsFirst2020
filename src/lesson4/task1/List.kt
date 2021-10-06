@@ -320,7 +320,7 @@ fun russian(n: Int): String {
                 if (i != 0) append(" ")
             }
         }
-    }
+    }.trim()
 }
 
 class RussianNumbers {
@@ -357,13 +357,14 @@ class RussianNumbers {
         fun renameFromCount(n: Int, name: String): String {
             return when (n) {
                 1 -> name
-                in 11..14 -> name.dropLast(1)
+                in 11..19, 0 -> name.dropLast(1)
                 in 2..4 -> name.dropLast(1) + WordHelper.getEnding(n, name)
                 else -> {
                     val end = WordHelper.getEnding(n, name)
                     if (end.isEmpty()) {
                         name.dropLast(1)
                     } else {
+                        name.dropLast(1)
                         name + end
                     }
                 }
