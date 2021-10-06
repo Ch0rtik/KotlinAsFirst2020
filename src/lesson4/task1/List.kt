@@ -291,7 +291,9 @@ fun russian(n: Int): String {
 
             if (countTriple < nameTriple.size) {
                 // Добавляет "тысяча", "миллион" и т.д.
-                val ten = if (i - 1 > 0) numbers[i - 1] else 0
+                val ten = if (i - 1 > 0 && numbers[i - 1] == 1) {
+                    1
+                } else 0
                 results.add(RussianNumbers.renameFromCount(numbers[i] + ten * 10, nameTriple[countTriple]))
             }
         }
@@ -354,23 +356,17 @@ class RussianNumbers {
             "девятьсот"
         )
 
-        fun renameFromCount(n: Int, name: String): String {
+        fun renameFromCount(n: Int, word: String): String {
+            val name = if (n > 1) word else word // TODO перевод в множ. число
             return when (n) {
                 1 -> name
-                in 11..19, 0 -> name.dropLast(1)
                 in 2..4 -> name.dropLast(1) + WordHelper.getEnding(n, name)
+//                in 11..19, 0 -> name.dropLast(1)
                 else -> {
-                    val end = WordHelper.getEnding(n, name)
-                    if (end.isEmpty()) {
-                        name.dropLast(1)
-                    } else {
-                        name.dropLast(1)
-                        name + end
-                    }
+                    name.dropLast(1)
                 }
             }
         }
-
 
         fun getExceptionYears(n: Int): String {
             return when (n) {
@@ -401,9 +397,7 @@ class RussianNumbers {
                     ""//temp
                 }
             }
-
         }
-
     }
 }
 
