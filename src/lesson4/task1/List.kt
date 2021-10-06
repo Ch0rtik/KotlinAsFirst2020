@@ -291,7 +291,7 @@ fun russian(n: Int): String {
 
             if (countTriple < nameTriple.size) {
                 // Добавляет "тысяча", "миллион" и т.д.
-                val ten = if (i - 1 > 0 && numbers[i - 1] == 1) {
+                val ten = if (i - 1 >= 0 && numbers[i - 1] == 1) {
                     1
                 } else 0
                 results.add(RussianNumbers.renameFromCount(numbers[i] + ten * 10, nameTriple[countTriple]))
@@ -357,7 +357,7 @@ class RussianNumbers {
         )
 
         fun renameFromCount(n: Int, word: String): String {
-            val name = if (n > 1) word else word // TODO перевод в множ. число
+            val name = word/*if (n > 1) word else word*/ // TODO перевод в множ. число
             return when (n) {
                 1 -> name
                 in 2..4 -> name.dropLast(1) + WordHelper.getEnding(n, name)
