@@ -284,26 +284,30 @@ fun russian(n: Int): String {
     var currentList: MutableList<String>
 
     for (i in numbers.size - 1 downTo 0) {
-        val currentTriple = ((numbers.size - 1) - i) / 3
+        val rang = (numbers.size - 1) - i
+        val currentTriple = rang / 3
         if (currentTriple != countTriple) {
             countTriple = currentTriple
 
             if (countTriple < nameTriple.size) {
                 // Добавляет "тысяча", "миллион" и т.д.
-                val ten = if (numbers.size < i + 1) numbers[i + 1] else 0
+                val ten = if (i - 1 > 0) numbers[i - 1] else 0
                 results.add(RussianNumbers.renameFromCount(numbers[i] + ten * 10, nameTriple[countTriple]))
             }
         }
 
         // Если число > 10 and < 20, то когда его заменять? -> На момент, когда обрабатываю десятки
-        currentList = when (((numbers.size - 1) - i) % 3) {
+        currentList = when (rang % 3) {
             0 -> units
             1 -> tens
             else -> hundreds
         }
-        if (i % 3 == 1 && numbers[i] == 1) {
-            // если число >= 10 and < 20
-            results[i - 1] = RussianNumbers.getExceptionYears(10 + numbers[i + 1]) // TODO renameEnding
+        if (rang % 3 == 1 && numbers[i] == 1 && numbers[i + 1] > 0) {
+            // если число > 10 and < 20, то заменяю единицы на исключения (11-19)
+            results[rang - 1 + countTriple] = RussianNumbers.getExceptionYears(10 + numbers[i + 1])
+        } else if (rang % 3 == 0 && rang > 0) {
+            // если разряд единиц во второй и более тройке
+            results.add(RussianNumbers.renameFromGender(numbers[i], currentList[numbers[i]], WordHelper.Gender.WOMAN))
         } else {
             results.add(currentList[numbers[i]])
         }
@@ -322,8 +326,8 @@ fun russian(n: Int): String {
 class RussianNumbers {
     companion object {
         val nameTriple = mutableListOf("", "тысяча", "миллион") // Знаю, что миллион не понадобится.
-
         // Разрабатываю логику с возможность масштабирования
+
         val units = mutableListOf("", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
         val tens = mutableListOf(
             "",
@@ -353,9 +357,10 @@ class RussianNumbers {
         fun renameFromCount(n: Int, name: String): String {
             return when (n) {
                 1 -> name
-                in 2..4 -> name.dropLast(1) + getEnding(n, name)
+                in 11..14 -> name.dropLast(1)
+                in 2..4 -> name.dropLast(1) + WordHelper.getEnding(n, name)
                 else -> {
-                    val end = getEnding(n, name)
+                    val end = WordHelper.getEnding(n, name)
                     if (end.isEmpty()) {
                         name.dropLast(1)
                     } else {
@@ -365,39 +370,97 @@ class RussianNumbers {
             }
         }
 
-        private fun getEnding(n: Int, name: String): String {
-            // TODO написать метод изменения окончаний для большинства слов
-            //тысяча ,миллион ,биллион (миллиард)[3] ,триллион ,квадриллион ,квинтиллион ,секстиллион ,септиллион ,октиллион ,нониллион ,дециллион ,ундециллион
-            val lastChar = name[name.length - 1]
-
-            return if (lastChar == 'а') {
-                when (n) {
-                    in 2..4 -> "и"
-                    else -> ""
-                }
-            } else {
-                when (n) {
-                    in 2..4 -> "а"
-                    else -> "ов"
-                }
-            }
-        }
 
         fun getExceptionYears(n: Int): String {
             return when (n) {
-                10 -> "десять"
                 11 -> "одинадцать"
-                12 -> "десять"
-                13 -> "десять"
-                14 -> "десять"
-                15 -> "десять"
-                16 -> "десять"
-                17 -> "десять"
-                18 -> "десять"
-                19 -> "десять"
+                12 -> "двенадцать"
+                13 -> "тринадцать"
+                14 -> "четырнадцать"
+                15 -> "пятнадцать"
+                16 -> "шестнадцать"
+                17 -> "семнадцать"
+                18 -> "восемьнадцать"
+                19 -> "девятнадцать"
                 else -> ""
             }
         }
 
+        fun renameFromGender(n: Int, word: String, gender: WordHelper.Gender): String {
+            return when (gender) {
+                // Подумай как сделать более универсально
+                // TODO метод для опр. рода
+                WordHelper.Gender.MAN -> "" //temp
+                WordHelper.Gender.WOMAN -> when (n) {
+                    1 -> "одна"
+                    2 -> "две"
+                    else -> word
+                }
+                else -> {
+                    ""//temp
+                }
+            }
+
+        }
+
+    }
+}
+
+class WordHelper {
+    enum class Case {
+        NOMINATIVE, GENITIVE, ACCUSATIVE, DATIVE, INSTRUMENTAL, PREPOSITION
+    }
+
+    enum class Gender {
+        MAN, WOMAN, NEUTER
+    }
+
+    companion object {
+        fun getEnding(n: Int, name: String): String {
+            //тысяча ,миллион ,биллион (миллиард)[3] ,триллион ,квадриллион ,квинтиллион ,секстиллион ,септиллион ,октиллион ,нониллион ,дециллион ,ундециллион
+            val declination = getDeclination(name)
+            return getEndFromDeclination(declination, Case.GENITIVE)
+        }
+
+        private fun getEndFromDeclination(declination: Int, case: Case): String {
+            //TODO доделать для всех склонений и родов
+            return when (declination) {
+                1 -> {
+                    when (case) {
+                        Case.GENITIVE -> "и"
+                        else -> "" // temp
+                    }
+                }
+                2 -> {
+                    when (case) {
+                        Case.GENITIVE -> "ов"
+                        else -> "" // temp
+                    }
+                }
+                else -> {
+                    when (case) {
+                        Case.GENITIVE -> "и"
+                        else -> "" // temp
+                    }
+                }
+            }
+        }
+
+        private fun getDeclination(word: String): Int {
+            //тысяча ,миллион ,биллион (миллиард)[3] ,триллион ,квадриллион ,квинтиллион ,секстиллион ,септиллион ,октиллион ,нониллион ,дециллион ,ундециллион
+            if (word.length > 2) return -1
+            val lastChar = word[word.length - 1]
+//            val ends = mutableListOf('а', 'я', 'о', 'е', 'ь')
+            val preEndingLetters = mutableListOf(
+                'ч', 'ш', 'щ', 'ж', 'б', 'в', 'т', 'з', 'д', 'л'
+            )
+
+            return when (lastChar) {
+                'а', 'я' -> 1
+                'о', 'е' -> 2
+                in preEndingLetters -> 3
+                else -> 2
+            }
+        }
     }
 }
