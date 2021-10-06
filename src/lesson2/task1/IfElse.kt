@@ -163,26 +163,22 @@ fun inControlCells(
     currentFigureType: TypeFigure, currentFigureX: Int, currentFigureY: Int,
     otherFigureX: Int, otherFigureY: Int
 ): Boolean {
-    var result = false
 
     // Нужно сделать эффективной по памяти и времени O(n)...
-    when (currentFigureType) {
+    return when (currentFigureType) {
         TypeFigure.BISHOP -> {
             // Если диагональ слева на право, то сумма x и y увел. на 2, иначе == тому же знач.
             // Чтобы опр. диагональ достаточно найти 1 из крайних клеток этой диагонали,
             // а затем определить, такая же крайняя клетка ли у диагонали otherFigure
 
-            result = inBishopControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
+            inBishopControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
         }
         TypeFigure.ROOK -> {
-            result = inRookControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
+            inRookControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
         }
-
         TypeFigure.QUEEN -> {
-            result = inRookControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
-            if (!result) {
-                result = inBishopControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
-            }
+            inRookControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
+                    || inBishopControlCells(currentFigureX, currentFigureY, otherFigureX, otherFigureY)
         }
         // Может по приколу сделать для ферзя, короля, коня и пешки?
         // Ферзь, очевидно, объединяет логику слона и ладьи, потому по-хорошему вынести бы их логику в отдельные методы
@@ -191,7 +187,6 @@ fun inControlCells(
         // конь - в процессе, но напоминает пешку
     }
 
-    return result
 }
 
 private fun inRookControlCells(
@@ -207,26 +202,9 @@ private fun inBishopControlCells(
     otherFigureX: Int,
     otherFigureY: Int
 ): Boolean {
-    var result = (currentFigureX + currentFigureY) == (otherFigureX + otherFigureY)
 
-    if (!result) {
-        val xMax = 8 // нумерация с 1
-        val yMax = 8
-
-        val maxDiagonalX: Int
-        val maxDiagonalY: Int
-        //Ищу крайнюю справа
-        //Для текущей фигуры
-        var delta = min(xMax - currentFigureX, yMax - currentFigureY)
-
-        maxDiagonalX = currentFigureX + delta
-        maxDiagonalY = currentFigureY + delta
-
-        // Для иной
-        delta = min(xMax - otherFigureX, yMax - otherFigureY)
-        result = (maxDiagonalX == otherFigureX + delta) && (maxDiagonalY == otherFigureY + delta)
-    }
-    return result
+    return (currentFigureX + currentFigureY) == (otherFigureX + otherFigureY) // Косая диагональ
+            || (currentFigureX - currentFigureY) == (otherFigureX - otherFigureY) // Простая диагональ
 }
 
 /**
