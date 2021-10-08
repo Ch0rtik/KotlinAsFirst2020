@@ -97,7 +97,8 @@ fun circleInside(
  * Вернуть true, если кирпич пройдёт
  */
 fun brickPasses(a: Int, b: Int, c: Int, r: Int, s: Int): Boolean {
-    val sides : MutableList<Int> = mutableListOf(a, b, c).sorted().toMutableList()
+    val sides : MutableList<Int> = mutableListOf(a, b, c)
+    sides.sort()
 
     var b1 = false
     var b2 = false

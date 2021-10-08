@@ -131,10 +131,8 @@ fun minDivisor(n: Int): Int {
  */
 fun maxDivisor(n: Int): Int {
     val mid = n / 2
-    var result = 1 // на тот случай, если число простое
-    // В задании указано "n > 1", однако в тестах используется 1 для проверки ожидаемого рез-та
-    // Поэтому я преположил, что там опечатка и должно быть "n >= 1"
-    for (i in mid downTo 2) {
+    var result = -1 // n <= 1
+    for (i in mid downTo 1) {
         if (n % i == 0) {
             result = i
             break

@@ -130,14 +130,13 @@ fun abs(v: List<Double>): Double = TODO()
  */
 fun mean(list: List<Double>): Double {
     if (list.isEmpty()) return 0.0
-    val result: Double
+
     var sum = 0.0
     for (i in list) {
         sum += i
     }
-    result = sum / list.size
 
-    return result
+    return sum / list.size
 }
 
 /**
@@ -325,83 +324,82 @@ fun russian(n: Int): String {
     }.trim()
 }
 
-class RussianNumbers {
-    companion object {
-        val nameTriple = mutableListOf("", "тысяча", "миллион") // Знаю, что миллион не понадобится.
-        // Разрабатываю логику с возможность масштабирования
+object RussianNumbers {
+    val nameTriple = mutableListOf("", "тысяча", "миллион") // Знаю, что миллион не понадобится.
+    // Разрабатываю логику с возможность масштабирования
 
-        val units = mutableListOf("", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
-        val tens = mutableListOf(
-            "",
-            "десять",
-            "двадцать",
-            "тридцать",
-            "сорок",
-            "пятьдесят",
-            "шестьдесят",
-            "семьдесят",
-            "восемьдесят",
-            "девяносто"
-        )
-        val hundreds = mutableListOf(
-            "",
-            "сто",
-            "двести",
-            "триста",
-            "четыреста",
-            "пятьсот",
-            "шестьсот",
-            "семьсот",
-            "восемьсот",
-            "девятьсот"
-        )
+    val units = mutableListOf("", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
+    val tens = mutableListOf(
+        "",
+        "десять",
+        "двадцать",
+        "тридцать",
+        "сорок",
+        "пятьдесят",
+        "шестьдесят",
+        "семьдесят",
+        "восемьдесят",
+        "девяносто"
+    )
+    val hundreds = mutableListOf(
+        "",
+        "сто",
+        "двести",
+        "триста",
+        "четыреста",
+        "пятьсот",
+        "шестьсот",
+        "семьсот",
+        "восемьсот",
+        "девятьсот"
+    )
 
-        fun renameFromCount(n: Int, word: String): String {
-            val name = word/*if (n > 1) word else word*/ // TODO перевод в множ. число
-            return when (n) {
-                1 -> name
-                in 2..4 -> name.dropLast(1) + WordHelper.getEnding(n, name)
+    fun renameFromCount(n: Int, word: String): String {
+        val name = word/*if (n > 1) word else word*/ // TODO перевод в множ. число
+        return when (n) {
+            1 -> name
+            in 2..4 -> name.dropLast(1) + WordHelper.getEnding(n, name)
 //                in 11..19, 0 -> name.dropLast(1)
-                else -> {
-                    name.dropLast(1)
-                }
-            }
-        }
-
-        fun getExceptionYears(n: Int): String {
-            return when (n) {
-                11 -> "одинадцать"
-                12 -> "двенадцать"
-                13 -> "тринадцать"
-                14 -> "четырнадцать"
-                15 -> "пятнадцать"
-                16 -> "шестнадцать"
-                17 -> "семнадцать"
-                18 -> "восемнадцать"
-                19 -> "девятнадцать"
-                else -> ""
-            }
-        }
-
-        fun renameFromGender(n: Int, word: String, gender: WordHelper.Gender): String {
-            return when (gender) {
-                // Подумай как сделать более универсально
-                // TODO метод для опр. рода
-                WordHelper.Gender.MAN -> "" //temp
-                WordHelper.Gender.WOMAN -> when (n) {
-                    1 -> "одна"
-                    2 -> "две"
-                    else -> word
-                }
-                else -> {
-                    ""//temp
-                }
+            else -> {
+                name.dropLast(1)
             }
         }
     }
+
+    fun getExceptionYears(n: Int): String {
+        return when (n) {
+            11 -> "одинадцать"
+            12 -> "двенадцать"
+            13 -> "тринадцать"
+            14 -> "четырнадцать"
+            15 -> "пятнадцать"
+            16 -> "шестнадцать"
+            17 -> "семнадцать"
+            18 -> "восемнадцать"
+            19 -> "девятнадцать"
+            else -> ""
+        }
+    }
+
+    fun renameFromGender(n: Int, word: String, gender: WordHelper.Gender): String {
+        return when (gender) {
+            // Подумай как сделать более универсально
+            // TODO метод для опр. рода
+            WordHelper.Gender.MAN -> "" //temp
+            WordHelper.Gender.WOMAN -> when (n) {
+                1 -> "одна"
+                2 -> "две"
+                else -> word
+            }
+            else -> {
+                ""//temp
+            }
+        }
+    }
+
 }
 
-class WordHelper {
+object WordHelper {
     enum class Case {
         NOMINATIVE, GENITIVE, ACCUSATIVE, DATIVE, INSTRUMENTAL, PREPOSITION
     }
@@ -410,52 +408,50 @@ class WordHelper {
         MAN, WOMAN, NEUTER
     }
 
-    companion object {
-        fun getEnding(n: Int, name: String): String {
-            //тысяча ,миллион ,биллион (миллиард)[3] ,триллион ,квадриллион ,квинтиллион ,секстиллион ,септиллион ,октиллион ,нониллион ,дециллион ,ундециллион
-            val declination = getDeclination(name)
-            return getEndFromDeclination(declination, Case.GENITIVE)
-        }
+    fun getEnding(n: Int, name: String): String {
+        //тысяча ,миллион ,биллион (миллиард)[3] ,триллион ,квадриллион ,квинтиллион ,секстиллион ,септиллион ,октиллион ,нониллион ,дециллион ,ундециллион
+        val declination = getDeclination(name)
+        return getEndFromDeclination(declination, Case.GENITIVE)
+    }
 
-        private fun getEndFromDeclination(declination: Int, case: Case): String {
-            //TODO доделать для всех склонений и родов
-            return when (declination) {
-                1 -> {
-                    when (case) {
-                        Case.GENITIVE -> "и"
-                        else -> "" // temp
-                    }
+    private fun getEndFromDeclination(declination: Int, case: Case): String {
+        //TODO доделать для всех склонений и родов
+        return when (declination) {
+            1 -> {
+                when (case) {
+                    Case.GENITIVE -> "и"
+                    else -> "" // temp
                 }
-                2 -> {
-                    when (case) {
-                        Case.GENITIVE -> "ов"
-                        else -> "" // temp
-                    }
+            }
+            2 -> {
+                when (case) {
+                    Case.GENITIVE -> "ов"
+                    else -> "" // temp
                 }
-                else -> {
-                    when (case) {
-                        Case.GENITIVE -> "и"
-                        else -> "" // temp
-                    }
+            }
+            else -> {
+                when (case) {
+                    Case.GENITIVE -> "и"
+                    else -> "" // temp
                 }
             }
         }
+    }
 
-        private fun getDeclination(word: String): Int {
-            //тысяча ,миллион ,биллион (миллиард)[3] ,триллион ,квадриллион ,квинтиллион ,секстиллион ,септиллион ,октиллион ,нониллион ,дециллион ,ундециллион
-            if (word.length > 2) return -1
-            val lastChar = word[word.length - 1]
+    private fun getDeclination(word: String): Int {
+        //тысяча ,миллион ,биллион (миллиард)[3] ,триллион ,квадриллион ,квинтиллион ,секстиллион ,септиллион ,октиллион ,нониллион ,дециллион ,ундециллион
+        if (word.length > 2) return -1
+        val lastChar = word[word.length - 1]
 //            val ends = mutableListOf('а', 'я', 'о', 'е', 'ь')
-            val preEndingLetters = mutableListOf(
-                'ч', 'ш', 'щ', 'ж', 'б', 'в', 'т', 'з', 'д', 'л'
-            )
+        val preEndingLetters = mutableListOf(
+            'ч', 'ш', 'щ', 'ж', 'б', 'в', 'т', 'з', 'д', 'л'
+        )
 
-            return when (lastChar) {
-                'а', 'я' -> 1
-                'о', 'е' -> 2
-                in preEndingLetters -> 3
-                else -> 2
-            }
+        return when (lastChar) {
+            'а', 'я' -> 1
+            'о', 'е' -> 2
+            in preEndingLetters -> 3
+            else -> 2
         }
     }
 }
