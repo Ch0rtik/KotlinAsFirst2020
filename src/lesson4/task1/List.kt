@@ -370,7 +370,7 @@ object RussianNumbers {
 
     fun getExceptionYears(n: Int): String {
         return when (n) {
-            11 -> "одинадцать"
+            11 -> "одиннадцать"
             12 -> "двенадцать"
             13 -> "тринадцать"
             14 -> "четырнадцать"
