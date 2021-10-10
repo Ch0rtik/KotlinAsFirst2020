@@ -5,6 +5,7 @@ package lesson3.task1
 import lesson1.task1.getNumberList
 import lesson1.task1.numberRevert
 import kotlin.math.abs
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 // Урок 3: циклы
@@ -293,17 +294,36 @@ fun fibSequenceDigit(n: Int): Int {
         increment++
 
         fib = fib(increment)
-        var x = revert(fib)
+        var x = longRevert(fib.toLong())
         if (fib % 10 == 0) isLastNull = true
         while (x > 0 || isLastNull) {
             count++
             if (count == n) {
-                result = x % 10
+                result = (x % 10L).toInt()
                 break
             }
-            if (x == 0 && isLastNull) isLastNull = false
+            if (x == 0L && isLastNull) isLastNull = false
             x /= 10
         }
+    }
+    return result
+}
+
+fun longRevert(n: Long): Long {
+    var size = 0
+    var x = n
+    while (x > 0) {
+        x /= 10
+        size++
+    }
+    x = n
+    var result = 0L
+    var a: Long
+    while (x > 0) {
+        a = x % 10L
+        size -= 1
+        result += a * 10.0.pow(size).toLong()
+        x /= 10
     }
     return result
 }
