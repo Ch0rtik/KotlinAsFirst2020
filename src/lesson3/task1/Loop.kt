@@ -288,7 +288,7 @@ fun fibSequenceDigit(n: Int): Int {
     var count = 0
     var increment = 0
     var isLastNull = false
-    var fib = 0
+    var fib:Int
     while (count < n) {
         increment++
 
