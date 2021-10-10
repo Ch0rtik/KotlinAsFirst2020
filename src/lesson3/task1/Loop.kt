@@ -278,7 +278,7 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  * Сложная (5 баллов)
  *
  * Найти n-ю цифру последовательности из чисел Фибоначчи (см. функцию fib выше):
- * 1123581321345589144...
+ * 1123581321_3455891442_33377610987...
  * Например, 2-я цифра равна 1, 9-я 2, 14-я 5.
  *
  * Использовать операции со строками в этой задаче запрещается.
@@ -287,17 +287,21 @@ fun fibSequenceDigit(n: Int): Int {
     var result = 0
     var count = 0
     var increment = 0
-
+    var isLastNull = false
+    var fib = 0
     while (count < n) {
         increment++
 
-        var x = revert(fib(increment))
-        while (x > 0) {
+        fib = fib(increment)
+        var x = revert(fib)
+        if (fib % 10 == 0) isLastNull = true
+        while (x > 0 || isLastNull) {
             count++
             if (count == n) {
                 result = x % 10
                 break
             }
+            if (x == 0 && isLastNull) isLastNull = false
             x /= 10
         }
     }
