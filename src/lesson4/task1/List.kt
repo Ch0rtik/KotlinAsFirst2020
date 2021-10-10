@@ -4,6 +4,7 @@ package lesson4.task1
 
 import lesson1.task1.discriminant
 import lesson1.task1.getNumberList
+import kotlin.math.min
 import kotlin.math.sqrt
 
 // Урок 4: списки
@@ -303,9 +304,10 @@ fun russian(n: Int): String {
             1 -> tens
             else -> hundreds
         }
-        if (rang % 3 == 1 && numbers[i] == 1 && numbers[i + 1] > 0) {
+        if (rang % 3 == 1 && numbers[i] == 1 && numbers[min(i + 1, numbers.size - 1)] > 0) {
             // если число > 10 and < 20, то заменяю единицы на исключения (11-19)
-            results[rang - 1 + countTriple] = RussianNumbers.getExceptionYears(10 + numbers[i + 1])
+            results[min(rang - 1 + countTriple, results.size - 1)] =
+                RussianNumbers.getExceptionYears(10 + numbers[i + 1])
         } else if (rang % 3 == 0 && rang > 0) {
             // если разряд единиц во второй и более тройке
             results.add(RussianNumbers.renameFromGender(numbers[i], currentList[numbers[i]], WordHelper.Gender.WOMAN))
