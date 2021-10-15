@@ -5,7 +5,6 @@ package lesson3.task1
 import lesson1.task1.getNumberList
 import lesson1.task1.numberRevert
 import kotlin.math.abs
-import kotlin.math.pow
 import kotlin.math.sqrt
 
 // Урок 3: циклы
@@ -273,7 +272,25 @@ fun cos(x: Double, eps: Double): Double = TODO()
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun squareSequenceDigit(n: Int): Int = TODO()
+fun squareSequenceDigit(n: Int): Int {
+    var count = 0
+    var increment = 0
+    var currentDigit = 1
+    var square: Int
+    while (count < n) {
+        increment++
+
+        square = currentDigit * currentDigit
+        val numbers = getNumberList(square)
+        if (count + numbers.size >= n) {
+            return numbers[n - count - 1]
+        }
+        count += numbers.size
+        currentDigit++
+    }
+    return 0
+
+}
 
 /**
  * Сложная (5 баллов)
@@ -285,45 +302,19 @@ fun squareSequenceDigit(n: Int): Int = TODO()
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun fibSequenceDigit(n: Int): Int {
-    var result = 0
     var count = 0
     var increment = 0
-    var isLastNull = false
-    var fib:Int
+
+    var fib: Int
     while (count < n) {
         increment++
 
         fib = fib(increment)
-        var x = longRevert(fib.toLong())
-        if (fib % 10 == 0) isLastNull = true
-        while (x > 0 || isLastNull) {
-            count++
-            if (count == n) {
-                result = (x % 10L).toInt()
-                break
-            }
-            if (x == 0L && isLastNull) isLastNull = false
-            x /= 10
+        val numbers = getNumberList(fib)
+        if (count + numbers.size >= n) {
+            return numbers[n - count - 1]
         }
+        count += numbers.size
     }
-    return result
-}
-
-fun longRevert(n: Long): Long {
-    var size = 0
-    var x = n
-    while (x > 0) {
-        x /= 10
-        size++
-    }
-    x = n
-    var result = 0L
-    var a: Long
-    while (x > 0) {
-        a = x % 10L
-        size -= 1
-        result += a * 10.0.pow(size).toLong()
-        x /= 10
-    }
-    return result
+    return 0
 }

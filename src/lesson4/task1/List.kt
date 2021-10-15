@@ -294,7 +294,7 @@ fun russian(n: Int): String {
                 val ten = if (i - 1 >= 0 && numbers[i - 1] == 1) {
                     1
                 } else 0
-                results.add(RussianNumbers.renameFromCount(numbers[i] + ten * 10, nameTriple[countTriple]))
+                results.add(RussianNumbers.renameFromCount(numbers[i] + ten * 10, nameTriple[countTriple].word))
             }
         }
 
@@ -310,7 +310,7 @@ fun russian(n: Int): String {
                 RussianNumbers.getExceptionYears(10 + numbers[i + 1])
         } else if (rang % 3 == 0 && rang > 0) {
             // если разряд единиц во второй и более тройке
-            results.add(RussianNumbers.renameFromGender(numbers[i], currentList[numbers[i]], WordHelper.Gender.WOMAN))
+            results.add(RussianNumbers.renameFromGender(numbers[i], currentList[numbers[i]], nameTriple[countTriple].gender))
         } else {
             results.add(currentList[numbers[i]])
         }
@@ -327,7 +327,10 @@ fun russian(n: Int): String {
 }
 
 object RussianNumbers {
-    val nameTriple = mutableListOf("", "тысяча", "миллион") // Знаю, что миллион не понадобится.
+    val nameTriple = mutableListOf(
+        Word(""),
+        Word("тысяча", WordHelper.Gender.WOMAN),
+        Word("миллион")) // Знаю, что миллион не понадобится.
     // Разрабатываю логику с возможность масштабирования
 
     val units = mutableListOf("", "один", "два", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять")
@@ -399,6 +402,11 @@ object RussianNumbers {
         }
     }
 
+}
+
+class Word(
+    val word: String,
+    val gender: WordHelper.Gender = WordHelper.Gender.MAN){
 }
 
 object WordHelper {
