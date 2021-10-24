@@ -405,9 +405,11 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
     }
 
+/*
     for (i in cells.indices) {
         println(cells[i].contentToString())
     }
+*/
 
     return if (cells.isNotEmpty() && cells.last().last().second.isNotEmpty()) {
         cells.last().last().second.split(", ").toSet()
