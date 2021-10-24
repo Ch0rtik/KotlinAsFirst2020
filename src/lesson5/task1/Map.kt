@@ -376,7 +376,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 var allNames = entry.key
                 if (currentBagCapacity - treasureCapacity > 0) {
 
-                    val columnOfRemainingSpace = ceil((currentBagCapacity - treasureCapacity - 1) / minTreasure.toDouble()).toInt()
+                    val columnOfRemainingSpace =
+                        ceil((currentBagCapacity - treasureCapacity - 1) / minTreasure.toDouble()).toInt()
 
                     if (columnOfRemainingSpace >= 0 &&
                         index > 0 && (columnOfRemainingSpace) >= 0 &&
@@ -387,10 +388,23 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                         allNames += ", ${cells[index - 1][columnOfRemainingSpace].second}"
                     }
                 }
-                cells[index][j] = Pair(sumPrices, allNames)
+                cells[index][j] =
+                    if (index > 0 && cells[index - 1][j].first > sumPrices)
+                        cells[index - 1][j]
+                    else
+                        Pair(
+                            sumPrices,
+                            allNames
+                        )
             }
         }
     }
+
+/*
+    for (i in cells.indices) {
+        println(cells[i].contentToString())
+    }
+*/
 
     return if (cells.isNotEmpty() && cells.last().last().second.isNotEmpty()) {
         cells.last().last().second.split(", ").toSet()
