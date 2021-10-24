@@ -2,6 +2,10 @@
 
 package lesson5.task1
 
+import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
+
 // Урок 5: ассоциативные массивы и множества
 // Максимальное количество баллов = 14
 // Рекомендуемое количество баллов = 9
@@ -277,7 +281,23 @@ fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<Stri
  *   findSumOfTwo(listOf(1, 2, 3), 4) -> Pair(0, 2)
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
-fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
+fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
+    val default = Pair(-1, -1)
+
+    if (list.isEmpty()) return default
+
+    val map = mutableMapOf<Int, Int>()
+    for ((i, v) in list.withIndex()) {
+
+        val difference = number - v
+        if (map.containsKey(v)) {
+            val dif: Int = map[v]!!
+            return Pair(min(dif, i), max(dif, i))
+        }
+        map[difference] = i
+    }
+    return default
+}
 
 /**
  * Очень сложная (8 баллов)
@@ -300,4 +320,81 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> = TODO()
  *     450
  *   ) -> emptySet()
  */
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
+
+/*
+fun main() {
+    println(
+        bagPacking(
+            mapOf(
+                "Гитара" to (1 to 1500),
+                "Магнитофон" to (4 to 3000),
+                "Ноутбук" to (3 to 2000),
+                "Айфон" to (1 to 2000)
+            ),
+            4
+        )
+    )
+}
+*/
+
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
+    // Идея позаимствована из книги Адитья Бхаргава "Грокаем алгоритмы", главы 9 - Динамическое программирование
+
+    val row = treasures.size
+    // количество стобцов равно объем/мин.вес (окргуление до ближайшего большего)
+    // однако насколько это решение хорошее с точки зрения быстродействия?
+    var minTreasure = -1
+    for (pair in treasures.values) {
+        if (minTreasure == -1 || pair.first < minTreasure) {
+            minTreasure = pair.first
+        }
+    }
+    val column = ceil(capacity / minTreasure.toDouble()).toInt()
+
+    // Т.к. динамическое программирование - разбиение сложных задач на подзадачи,
+    // то для того, чтобы экономить время, стоит сохранять cells где-то, и в случае добавления новых сокровищ,
+    // передавать уже рассчитаный cells в функции в качестве аргумента.
+    // Но это в рамках реального кода, реальной задачи. Тут это не требуется.
+    val cells: Array<Array<Pair<Int, String>>> = Array(row) {
+        Array(
+            column
+        ) { Pair(0, "") } // Строка будет содержать предметы разделенные спец.знаком (допустим "\" или лучше ", ")
+
+    } // cell[i][j], где i - строка, j - столбец
+
+    treasures.onEachIndexed { index, entry ->
+        val treasureCapacity = entry.value.first
+        val price = entry.value.second
+        for (j in cells[index].indices) {
+            val currentBagCapacity = min(minTreasure * (j + 1), capacity)
+
+            if (currentBagCapacity < treasureCapacity) {
+                cells[index][j] = if (index > 0) cells[index - 1][j] else Pair(0, "") // Предыдущий максимум
+            } else {
+                // Стоимость текущего элемента + стоимость оставшегося пространства
+                var sumPrices = price
+                var allNames = entry.key
+                if (currentBagCapacity - treasureCapacity > 0) {
+
+                    val columnOfRemainingSpace = ceil((currentBagCapacity - treasureCapacity - 1) / minTreasure.toDouble()).toInt()
+
+                    if (columnOfRemainingSpace >= 0 &&
+                        index > 0 && (columnOfRemainingSpace) >= 0 &&
+                        cells[index - 1][columnOfRemainingSpace].first > 0
+                    ) {
+
+                        sumPrices += cells[index - 1][columnOfRemainingSpace].first
+                        allNames += ", ${cells[index - 1][columnOfRemainingSpace].second}"
+                    }
+                }
+                cells[index][j] = Pair(sumPrices, allNames)
+            }
+        }
+    }
+
+    return if (cells.last().last().second.isNotEmpty()) {
+        setOf(cells.last().last().second)
+    } else {
+        emptySet()
+    }
+}

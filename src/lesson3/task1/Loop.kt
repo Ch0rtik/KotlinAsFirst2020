@@ -305,11 +305,10 @@ fun fibSequenceDigit(n: Int): Int {
     var count = 0
     var increment = 0
 
-    var fib: Int
     while (count < n) {
         increment++
 
-        fib = fib(increment)
+        val fib = fib(increment)
         val numbers = getNumberList(fib)
         if (count + numbers.size >= n) {
             return numbers[n - count - 1]

@@ -178,7 +178,6 @@ fun getNumberList(number: Int): MutableList<Int> {
     // Вернул изначальный вариант, хочу его преиспользовать в Lesson.Logical isHappyNumber и др.
     val ints = mutableListOf<Int>()
     var x = number
-
     while (x > 0) {
         ints.add(x % 10)
         x /= 10

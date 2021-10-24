@@ -390,14 +390,14 @@ object RussianNumbers {
         return when (gender) {
             // Подумай как сделать более универсально
             // TODO метод для опр. рода
-            WordHelper.Gender.MAN -> "" //temp
+            WordHelper.Gender.MAN -> word //temp
             WordHelper.Gender.WOMAN -> when (n) {
                 1 -> "одна"
                 2 -> "две"
                 else -> word
             }
             else -> {
-                ""//temp
+                word//temp
             }
         }
     }
