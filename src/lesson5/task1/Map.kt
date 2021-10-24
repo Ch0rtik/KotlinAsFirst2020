@@ -393,7 +393,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     }
 
     return if (cells.isNotEmpty() && cells.last().last().second.isNotEmpty()) {
-        setOf(cells.last().last().second)
+        cells.last().last().second.split(", ").toSet()
     } else {
         emptySet()
     }
