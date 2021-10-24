@@ -274,11 +274,9 @@ fun cos(x: Double, eps: Double): Double = TODO()
  */
 fun squareSequenceDigit(n: Int): Int {
     var count = 0
-    var increment = 0
     var currentDigit = 1
     var square: Int
     while (count < n) {
-        increment++
 
         square = currentDigit * currentDigit
         val numbers = getNumberList(square)

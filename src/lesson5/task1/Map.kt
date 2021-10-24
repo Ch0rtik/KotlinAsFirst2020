@@ -349,6 +349,11 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             minTreasure = pair.first
         }
     }
+    // если минимальный обьем 100, но присутствует объект с весом 150, 750 и т.п.,
+    // то из-за округления часть пространства теряется и результат получается некорректным
+    // поэтому я уменьшаю объем клетки еще в 2 раза, по аналогии поиска погрешности в физике (половина от цены деления)
+    // Потестил с разными значениями, вроде как работает =)
+    minTreasure = max(minTreasure / 2, 1)
     val column = ceil(capacity / minTreasure.toDouble()).toInt()
 
     // Т.к. динамическое программирование - разбиение сложных задач на подзадачи,
@@ -377,7 +382,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 if (currentBagCapacity - treasureCapacity > 0) {
 
                     val columnOfRemainingSpace =
-                        ceil((currentBagCapacity - treasureCapacity - 1) / minTreasure.toDouble()).toInt()
+                        ((currentBagCapacity - treasureCapacity) / minTreasure) - 1
 
                     if (columnOfRemainingSpace >= 0 &&
                         index > 0 && (columnOfRemainingSpace) >= 0 &&
@@ -400,11 +405,9 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
     }
 
-/*
     for (i in cells.indices) {
         println(cells[i].contentToString())
     }
-*/
 
     return if (cells.isNotEmpty() && cells.last().last().second.isNotEmpty()) {
         cells.last().last().second.split(", ").toSet()

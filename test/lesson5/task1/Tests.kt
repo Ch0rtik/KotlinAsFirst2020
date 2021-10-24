@@ -335,5 +335,36 @@ class Tests {
                 450
             )
         )
+        assertEquals(
+            setOf("0"),
+            bagPacking(
+                mapOf("0" to (1 to 2), "1" to (2 to 1)),
+                2
+            )
+        )
+        assertEquals(
+            setOf("Айфон", "Ноутбук","Магнитофон"),
+            bagPacking(
+                mapOf(
+                    "Гитара" to (200 to 1500),
+                    "Магнитофон" to (750 to 3000),
+                    "Ноутбук" to (100 to 2000),
+                    "Айфон" to (150 to 2000)
+                ),
+                1000
+            )
+        )
+        assertEquals(
+            setOf("Айфон", "Ноутбук","Гитара"),
+            bagPacking(
+                mapOf(
+                    "Гитара" to (200 to 1500),
+                    "Магнитофон" to (750 to 3000),
+                    "Ноутбук" to (125 to 2000),
+                    "Айфон" to (150 to 2000)
+                ),
+                1000
+            )
+        )
     }
 }
