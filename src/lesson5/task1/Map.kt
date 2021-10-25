@@ -321,12 +321,6 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 
-/*
-fun main() {
-    println(getGCD(36,7))
-}
-*/
-
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     // Идея позаимствована из книги Адитья Бхаргава "Грокаем алгоритмы", главы 9 - Динамическое программирование
 
@@ -362,12 +356,14 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
 
                     val columnOfRemainingSpace = ((currentBagCapacity - treasureCapacity) / column) - 1
 
-                    if (columnOfRemainingSpace >= 0 && previousCells[columnOfRemainingSpace].first > 0) {
+                    if (columnOfRemainingSpace >= 0) {
 
                         sumPrices += previousCells[columnOfRemainingSpace].first
                         allNames.addAll(previousCells[columnOfRemainingSpace].second)
                     }
                 }
+
+//                if (sumPrices > previousCells[j].first) currentCells[j] = Pair(sumPrices, allNames)
                 currentCells[j] = if (previousCells[j].first > sumPrices) {
                     previousCells[j]
                 } else {
