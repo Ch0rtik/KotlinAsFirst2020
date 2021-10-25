@@ -2,7 +2,6 @@
 
 package lesson5.task1
 
-import lesson3.task1.minDivisor
 import lesson4.task1.factorize
 import kotlin.math.ceil
 import kotlin.math.min
@@ -336,21 +335,25 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // то для того, чтобы экономить время, стоит сохранять cells где-то, и в случае добавления новых сокровищ,
     // передавать уже рассчитаный cells в функции в качестве аргумента.
     // Но это в рамках реального кода, реальной задачи. Тут это не требуется.
-    val cells = Array<Array<Pair<Int, Set<String>>>>(rowCount) {
-        Array(
-            columnCount
-        ) { Pair(0, mutableSetOf()) }
+    var previousCells: Array<Pair<Int, Set<String>>>
+    var currentCells = Array<Pair<Int, Set<String>>>(columnCount) {
+        Pair(0, mutableSetOf())
     }
     // cell[i][j], где i - строка, j - столбец
 
     treasures.onEachIndexed { index, entry ->
+        previousCells = currentCells
+        currentCells = Array(columnCount) {
+            Pair(0, mutableSetOf())
+        }
+
         val treasureCapacity = entry.value.first
         val price = entry.value.second
-        for (j in cells[index].indices) {
+        for (j in currentCells.indices) {
             val currentBagCapacity = min(column * (j + 1), capacity)
 
             if (currentBagCapacity < treasureCapacity) {
-                cells[index][j] = if (index > 0) cells[index - 1][j] else Pair(0, mutableSetOf()) // Предыдущий максимум
+                currentCells[j] = if (index > 0) previousCells[j] else Pair(0, mutableSetOf()) // Предыдущий максимум
             } else {
                 // Стоимость текущего элемента + стоимость оставшегося пространства
                 var sumPrices = price
@@ -362,16 +365,16 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
 
                     if (columnOfRemainingSpace >= 0 &&
                         index > 0 && (columnOfRemainingSpace) >= 0 &&
-                        cells[index - 1][columnOfRemainingSpace].first > 0
+                        previousCells[columnOfRemainingSpace].first > 0
                     ) {
 
-                        sumPrices += cells[index - 1][columnOfRemainingSpace].first
-                        allNames.addAll(cells[index - 1][columnOfRemainingSpace].second)
+                        sumPrices += previousCells[columnOfRemainingSpace].first
+                        allNames.addAll(previousCells[columnOfRemainingSpace].second)
                     }
                 }
-                cells[index][j] =
-                    if (index > 0 && cells[index - 1][j].first > sumPrices)
-                        cells[index - 1][j]
+                currentCells[j] =
+                    if (index > 0 && previousCells[j].first > sumPrices)
+                        previousCells[j]
                     else
                         Pair(
                             sumPrices,
@@ -381,8 +384,8 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
     }
 
-    return if (cells.isNotEmpty() && cells.last().last().second.isNotEmpty()) {
-        cells.last().last().second
+    return if (currentCells.isNotEmpty() && currentCells.last().second.isNotEmpty()) {
+        currentCells.last().second
     } else {
         emptySet()
     }
@@ -413,10 +416,9 @@ private fun getColumnByGCD(
         listCommonDivisor = i
     }
 
-    if (listCommonDivisor != null && listCommonDivisor.size > 1 ) {
+    if (listCommonDivisor != null && listCommonDivisor.size > 0) {
         listCommonDivisor.forEach { n -> GCD *= n }
     }
-
 
     return when {
         GCD != 1 -> GCD
