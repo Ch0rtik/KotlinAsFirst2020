@@ -416,7 +416,7 @@ private fun getColumnByGCD(
         listCommonDivisor = i
     }
 
-    if (listCommonDivisor != null && listCommonDivisor.size > 0) {
+    if (listCommonDivisor != null && listCommonDivisor.size > 1) {
         listCommonDivisor.forEach { n -> GCD *= n }
     }
 
