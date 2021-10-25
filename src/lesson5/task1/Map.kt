@@ -331,15 +331,10 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     // Идея позаимствована из книги Адитья Бхаргава "Грокаем алгоритмы", главы 9 - Динамическое программирование
 
     if (treasures.isEmpty()) return emptySet()
-    // количество стобцов равно объем/мин.вес (окргуление до ближайшего большего)
-    // однако насколько это решение хорошее с точки зрения быстродействия?
-    val column = treasures.values.reduce { a, b -> Pair(getGCD(a.first, b.first), 0) }.first
+
+    val column = treasures.map { v -> v.value.first }.reduce { a, b -> getGCD(a, b) }
     val columnCount = ceil(capacity / column.toDouble()).toInt()
 
-    // Т.к. динамическое программирование - разбиение сложных задач на подзадачи,
-    // то для того, чтобы экономить время, стоит сохранять cells где-то, и в случае добавления новых сокровищ,
-    // передавать уже рассчитаный cells в функции в качестве аргумента.
-    // Но это в рамках реального кода, реальной задачи. Тут это не требуется.
     var previousCells: Array<Pair<Int, Set<String>>>
     var currentCells = Array<Pair<Int, Set<String>>>(columnCount) {
         Pair(0, mutableSetOf())
@@ -368,21 +363,17 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     val columnOfRemainingSpace =
                         ((currentBagCapacity - treasureCapacity) / column) - 1
 
-                    if (columnOfRemainingSpace >= 0 && previousCells[columnOfRemainingSpace].first > 0
-                    ) {
+                    if (columnOfRemainingSpace >= 0 && previousCells[columnOfRemainingSpace].first > 0) {
 
                         sumPrices += previousCells[columnOfRemainingSpace].first
                         allNames.addAll(previousCells[columnOfRemainingSpace].second)
                     }
                 }
-                currentCells[j] =
-                    if (index > 0 && previousCells[j].first > sumPrices)
-                        previousCells[j]
-                    else
-                        Pair(
-                            sumPrices,
-                            allNames
-                        )
+                currentCells[j] = if (previousCells[j].first > sumPrices) {
+                    previousCells[j]
+                } else {
+                    Pair(sumPrices, allNames)
+                }
             }
         }
     }
@@ -393,6 +384,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
 fun getGCD(a: Int, b: Int): Int {
     val max = max(a, b)
     val min = min(a, b)
+
     return if (max % min == 0) min
     else getGCD(min, max % min)
 }
