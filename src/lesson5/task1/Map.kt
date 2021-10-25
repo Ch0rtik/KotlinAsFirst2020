@@ -2,8 +2,8 @@
 
 package lesson5.task1
 
+import lesson4.task1.factorize
 import kotlin.math.ceil
-import kotlin.math.max
 import kotlin.math.min
 
 // Урок 5: ассоциативные массивы и множества
@@ -290,9 +290,9 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
     for ((i, v) in list.withIndex()) {
 
         val difference = number - v
-        if (map.containsKey(v)) {
-            val dif: Int = map[v]!!
-            return Pair(min(dif, i), max(dif, i))
+        if (v in map) {
+            val dif = map[v]!!
+            return Pair(dif, i)
         }
         map[difference] = i
     }
@@ -321,68 +321,43 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 
-/*
-fun main() {
-    println(
-        bagPacking(
-            mapOf(
-                "Гитара" to (1 to 1500),
-                "Магнитофон" to (4 to 3000),
-                "Ноутбук" to (3 to 2000),
-                "Айфон" to (1 to 2000)
-            ),
-            4
-        )
-    )
-}
-*/
 
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     // Идея позаимствована из книги Адитья Бхаргава "Грокаем алгоритмы", главы 9 - Динамическое программирование
 
-    val row = treasures.size
+    val rowCount = treasures.size
     // количество стобцов равно объем/мин.вес (окргуление до ближайшего большего)
     // однако насколько это решение хорошее с точки зрения быстродействия?
-    var minTreasure = -1
-    for (pair in treasures.values) {
-        if (minTreasure == -1 || pair.first < minTreasure) {
-            minTreasure = pair.first
-        }
-    }
-    // если минимальный обьем 100, но присутствует объект с весом 150, 750 и т.п.,
-    // то из-за округления часть пространства теряется и результат получается некорректным
-    // поэтому я уменьшаю объем клетки еще в 2 раза, по аналогии поиска погрешности в физике (половина от цены деления)
-    // Потестил с разными значениями, вроде как работает =)
-    minTreasure = max(minTreasure / 2, 1)
-    val column = ceil(capacity / minTreasure.toDouble()).toInt()
+    val column = getColumnByGCD(treasures, capacity)
+    val columnCount = ceil(capacity / column.toDouble()).toInt()
 
     // Т.к. динамическое программирование - разбиение сложных задач на подзадачи,
     // то для того, чтобы экономить время, стоит сохранять cells где-то, и в случае добавления новых сокровищ,
     // передавать уже рассчитаный cells в функции в качестве аргумента.
     // Но это в рамках реального кода, реальной задачи. Тут это не требуется.
-    val cells: Array<Array<Pair<Int, String>>> = Array(row) {
+    val cells = Array<Array<Pair<Int, Set<String>>>>(rowCount) {
         Array(
-            column
-        ) { Pair(0, "") } // Строка будет содержать предметы разделенные спец.знаком (допустим "\" или лучше ", ")
-
-    } // cell[i][j], где i - строка, j - столбец
+            columnCount
+        ) { Pair(0, mutableSetOf()) }
+    }
+    // cell[i][j], где i - строка, j - столбец
 
     treasures.onEachIndexed { index, entry ->
         val treasureCapacity = entry.value.first
         val price = entry.value.second
         for (j in cells[index].indices) {
-            val currentBagCapacity = min(minTreasure * (j + 1), capacity)
+            val currentBagCapacity = min(column * (j + 1), capacity)
 
             if (currentBagCapacity < treasureCapacity) {
-                cells[index][j] = if (index > 0) cells[index - 1][j] else Pair(0, "") // Предыдущий максимум
+                cells[index][j] = if (index > 0) cells[index - 1][j] else Pair(0, mutableSetOf()) // Предыдущий максимум
             } else {
                 // Стоимость текущего элемента + стоимость оставшегося пространства
                 var sumPrices = price
-                var allNames = entry.key
+                val allNames = mutableSetOf(entry.key)
                 if (currentBagCapacity - treasureCapacity > 0) {
 
                     val columnOfRemainingSpace =
-                        ((currentBagCapacity - treasureCapacity) / minTreasure) - 1
+                        ((currentBagCapacity - treasureCapacity) / column) - 1
 
                     if (columnOfRemainingSpace >= 0 &&
                         index > 0 && (columnOfRemainingSpace) >= 0 &&
@@ -390,7 +365,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     ) {
 
                         sumPrices += cells[index - 1][columnOfRemainingSpace].first
-                        allNames += ", ${cells[index - 1][columnOfRemainingSpace].second}"
+                        allNames.addAll(cells[index - 1][columnOfRemainingSpace].second)
                     }
                 }
                 cells[index][j] =
@@ -405,15 +380,42 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
     }
 
-/*
-    for (i in cells.indices) {
-        println(cells[i].contentToString())
-    }
-*/
-
     return if (cells.isNotEmpty() && cells.last().last().second.isNotEmpty()) {
-        cells.last().last().second.split(", ").toSet()
+        cells.last().last().second
     } else {
         emptySet()
     }
+}
+
+private fun getColumnByGCD(
+    treasures: Map<String, Pair<Int, Int>>,
+    capacity: Int
+): Int {
+    var GCD = 1 //greatest common divisor
+    val listOfDivisors = mutableListOf<MutableList<Int>>()
+    var minTreasure = -1
+    for (pair in treasures.values) {
+        if (pair.first > 1) {
+            listOfDivisors.add(factorize(pair.first).toMutableList())
+        }
+
+        if (minTreasure == -1 || minTreasure > pair.first) {
+            minTreasure = pair.first
+        }
+    }
+    var listCommonDivisor: MutableList<Int>? = null
+    for (i in listOfDivisors) {
+        if (listCommonDivisor == null) {
+            listCommonDivisor = i
+            continue
+        }
+
+        i.retainAll(listCommonDivisor)
+        listCommonDivisor = i
+    }
+
+    if (listCommonDivisor != null && listCommonDivisor.isNotEmpty()) {
+        listCommonDivisor.forEach { n -> GCD *= n }
+    }
+    return if (GCD != 1) GCD else minTreasure
 }
