@@ -2,6 +2,7 @@
 
 package lesson5.task1
 
+import lesson3.task1.minDivisor
 import lesson4.task1.factorize
 import kotlin.math.ceil
 import kotlin.math.min
@@ -395,9 +396,7 @@ private fun getColumnByGCD(
     val listOfDivisors = mutableListOf<MutableList<Int>>()
     var minTreasure = -1
     for (pair in treasures.values) {
-        if (pair.first > 1) {
-            listOfDivisors.add(factorize(pair.first).toMutableList())
-        }
+        listOfDivisors.add(factorize(pair.first).toMutableList())
 
         if (minTreasure == -1 || minTreasure > pair.first) {
             minTreasure = pair.first
@@ -414,8 +413,13 @@ private fun getColumnByGCD(
         listCommonDivisor = i
     }
 
-    if (listCommonDivisor != null && listCommonDivisor.isNotEmpty()) {
+    if (listCommonDivisor != null && listCommonDivisor.size > 1 ) {
         listCommonDivisor.forEach { n -> GCD *= n }
     }
-    return if (GCD != 1) GCD else minTreasure
+
+
+    return when {
+        GCD != 1 -> GCD
+        else -> minTreasure
+    }
 }
