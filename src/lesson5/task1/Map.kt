@@ -360,8 +360,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 val allNames = mutableSetOf(entry.key)
                 if (currentBagCapacity > treasureCapacity) {
 
-                    val columnOfRemainingSpace =
-                        ((currentBagCapacity - treasureCapacity) / column) - 1
+                    val columnOfRemainingSpace = ((currentBagCapacity - treasureCapacity) / column) - 1
 
                     if (columnOfRemainingSpace >= 0 && previousCells[columnOfRemainingSpace].first > 0) {
 
