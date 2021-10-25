@@ -363,12 +363,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                     }
                 }
 
-//                if (sumPrices > previousCells[j].first) currentCells[j] = Pair(sumPrices, allNames)
-                currentCells[j] = if (previousCells[j].first > sumPrices) {
-                    previousCells[j]
-                } else {
-                    Pair(sumPrices, allNames)
-                }
+                if (sumPrices > previousCells[j].first) currentCells[j] = Pair(sumPrices, allNames)
             }
         }
     }
