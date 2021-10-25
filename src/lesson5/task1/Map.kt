@@ -2,8 +2,8 @@
 
 package lesson5.task1
 
-import lesson4.task1.factorize
 import kotlin.math.ceil
+import kotlin.math.max
 import kotlin.math.min
 
 // Урок 5: ассоциативные массивы и множества
@@ -321,6 +321,11 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *   ) -> emptySet()
  */
 
+/*
+fun main() {
+    println(getGCD(36,7))
+}
+*/
 
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     // Идея позаимствована из книги Адитья Бхаргава "Грокаем алгоритмы", главы 9 - Динамическое программирование
@@ -328,7 +333,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     val rowCount = treasures.size
     // количество стобцов равно объем/мин.вес (окргуление до ближайшего большего)
     // однако насколько это решение хорошее с точки зрения быстродействия?
-    val column = getColumnByGCD(treasures, capacity)
+    val column = treasures.values.reduce { a, b -> Pair(getGCD(a.first, b.first), 0) }.first
     val columnCount = ceil(capacity / column.toDouble()).toInt()
 
     // Т.к. динамическое программирование - разбиение сложных задач на подзадачи,
@@ -353,19 +358,17 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             val currentBagCapacity = min(column * (j + 1), capacity)
 
             if (currentBagCapacity < treasureCapacity) {
-                currentCells[j] = if (index > 0) previousCells[j] else Pair(0, mutableSetOf()) // Предыдущий максимум
+                currentCells[j] = previousCells[j] // Предыдущий максимум
             } else {
                 // Стоимость текущего элемента + стоимость оставшегося пространства
                 var sumPrices = price
                 val allNames = mutableSetOf(entry.key)
-                if (currentBagCapacity - treasureCapacity > 0) {
+                if (currentBagCapacity > treasureCapacity) {
 
                     val columnOfRemainingSpace =
                         ((currentBagCapacity - treasureCapacity) / column) - 1
 
-                    if (columnOfRemainingSpace >= 0 &&
-                        index > 0 && (columnOfRemainingSpace) >= 0 &&
-                        previousCells[columnOfRemainingSpace].first > 0
+                    if (columnOfRemainingSpace >= 0 && previousCells[columnOfRemainingSpace].first > 0
                     ) {
 
                         sumPrices += previousCells[columnOfRemainingSpace].first
@@ -384,44 +387,12 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
         }
     }
 
-    return if (currentCells.isNotEmpty() && currentCells.last().second.isNotEmpty()) {
-        currentCells.last().second
-    } else {
-        emptySet()
-    }
+    return currentCells.lastOrNull()?.second ?: emptySet()
 }
 
-private fun getColumnByGCD(
-    treasures: Map<String, Pair<Int, Int>>,
-    capacity: Int
-): Int {
-    var GCD = 1 //greatest common divisor
-    val listOfDivisors = mutableListOf<MutableList<Int>>()
-    var minTreasure = 1
-    for (pair in treasures.values) {
-        listOfDivisors.add(factorize(pair.first).toMutableList())
-
-        if (minTreasure == -1 || minTreasure > pair.first) {
-            minTreasure = pair.first
-        }
-    }
-    var listCommonDivisor: MutableList<Int>? = null
-    for (i in listOfDivisors) {
-        if (listCommonDivisor == null) {
-            listCommonDivisor = i
-            continue
-        }
-
-        i.retainAll(listCommonDivisor)
-        listCommonDivisor = i
-    }
-
-    if (listCommonDivisor != null && listCommonDivisor.isNotEmpty()) {
-        listCommonDivisor.forEach { n -> GCD *= n }
-    }
-
-    return when {
-        GCD != 1 -> GCD
-        else -> minTreasure
-    }
+fun getGCD(a: Int, b: Int): Int {
+    val max = max(a, b)
+    val min = min(a, b)
+    return if (max % min == 0) min
+    else getGCD(min, max % min)
 }
