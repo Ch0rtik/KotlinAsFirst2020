@@ -330,7 +330,7 @@ fun main() {
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
     // Идея позаимствована из книги Адитья Бхаргава "Грокаем алгоритмы", главы 9 - Динамическое программирование
 
-    val rowCount = treasures.size
+    if (treasures.isEmpty()) return emptySet()
     // количество стобцов равно объем/мин.вес (окргуление до ближайшего большего)
     // однако насколько это решение хорошее с точки зрения быстродействия?
     val column = treasures.values.reduce { a, b -> Pair(getGCD(a.first, b.first), 0) }.first
