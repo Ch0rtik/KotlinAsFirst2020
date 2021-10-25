@@ -397,7 +397,7 @@ private fun getColumnByGCD(
 ): Int {
     var GCD = 1 //greatest common divisor
     val listOfDivisors = mutableListOf<MutableList<Int>>()
-    var minTreasure = -1
+    var minTreasure = 1
     for (pair in treasures.values) {
         listOfDivisors.add(factorize(pair.first).toMutableList())
 
@@ -416,7 +416,7 @@ private fun getColumnByGCD(
         listCommonDivisor = i
     }
 
-    if (listCommonDivisor != null && listCommonDivisor.size > 1) {
+    if (listCommonDivisor != null && listCommonDivisor.isNotEmpty()) {
         listCommonDivisor.forEach { n -> GCD *= n }
     }
 
