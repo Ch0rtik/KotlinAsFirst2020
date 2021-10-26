@@ -330,16 +330,11 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     val columnCount = ceil(capacity / column.toDouble()).toInt()
 
     var previousCells: Array<Pair<Int, Set<String>>>
-    var currentCells = Array<Pair<Int, Set<String>>>(columnCount) {
-        Pair(0, mutableSetOf())
-    }
-    // cell[i][j], где i - строка, j - столбец
+    var currentCells = Array<Pair<Int, Set<String>>>(columnCount) { Pair(0, mutableSetOf()) }
 
     treasures.onEach { entry ->
         previousCells = currentCells
-        currentCells = Array(columnCount) {
-            Pair(0, mutableSetOf())
-        }
+        currentCells = Array(columnCount) { Pair(0, mutableSetOf()) }
 
         val treasureCapacity = entry.value.first
         val price = entry.value.second
@@ -355,8 +350,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 val columnOfRemainingSpace = ((currentBagCapacity - treasureCapacity) / column) - 1
 
                 if (columnOfRemainingSpace >= 0) {
-                    // есть свободное пространство
-
+                    // если есть свободное пространство
                     sumPrices += previousCells[columnOfRemainingSpace].first
                     allNames.addAll(previousCells[columnOfRemainingSpace].second)
                 }
@@ -365,7 +359,6 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
             }
         }
     }
-
     return currentCells.lastOrNull()?.second ?: emptySet()
 }
 
