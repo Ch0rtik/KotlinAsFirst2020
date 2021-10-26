@@ -157,7 +157,10 @@ fun firstDuplicateIndex(str: String): Int {
     var result = ""
     for ((i, s) in words.withIndex()) {
         if (i == 0) continue
-        if (words[i - 1] == s) result = "$s $s"
+        if (words[i - 1] == s){
+            result = "$s $s"
+            break
+        }
     }
 
     return if (result.isEmpty()) - 1
