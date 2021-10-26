@@ -154,17 +154,20 @@ fun firstDuplicateIndex(str: String): Int {
     if (!str.contains(" ")) return -1
     val words = text.split(" ")
 
-    var result = ""
+    var result = 0
     for ((i, s) in words.withIndex()) {
-        if (i == 0) continue
-        if (words[i - 1] == s){
-            result = "$s $s"
+        result += s.length
+        if (i == 0) {
+            continue
+        }
+        result++ // пробел
+        if (words[i - 1] == s) {
+            result  -= s.length * 2 + 1
             break
         }
     }
 
-    return if (result.isEmpty()) - 1
-    else text.indexOf(result)
+    return if (result != 0) result else -1
 }
 
 /**
@@ -178,7 +181,28 @@ fun firstDuplicateIndex(str: String): Int {
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше нуля либо равны нулю.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    if (description.isEmpty()) return ""
+
+    val products = description.split("; ")
+    var result = ""
+    var maxPrice = 0.0
+
+    products.forEach { product ->
+        val s = product.split(" ")
+        if (s.size != 2 || product.contains(";")) return ""
+
+        val name = s[0]
+        val price = s[1].toDoubleOrNull() ?: return ""
+
+        if (price > maxPrice) {
+            maxPrice = price
+            result = name
+        }
+    }
+
+    return result
+}
 
 /**
  * Сложная (6 баллов)
