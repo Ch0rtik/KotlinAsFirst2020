@@ -335,7 +335,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
     }
     // cell[i][j], где i - строка, j - столбец
 
-    treasures.onEachIndexed { index, entry ->
+    treasures.onEach { entry ->
         previousCells = currentCells
         currentCells = Array(columnCount) {
             Pair(0, mutableSetOf())
