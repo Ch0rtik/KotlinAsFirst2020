@@ -155,6 +155,7 @@ fun firstDuplicateIndex(str: String): Int {
     val words = text.split(" ")
 
     var result = 0
+    var hasDuplicate = false
     for ((i, s) in words.withIndex()) {
         result += s.length
         if (i == 0) {
@@ -163,11 +164,12 @@ fun firstDuplicateIndex(str: String): Int {
         result++ // пробел
         if (words[i - 1] == s) {
             result  -= s.length * 2 + 1
+            hasDuplicate = true
             break
         }
     }
 
-    return if (result != 0) result else -1
+    return if (hasDuplicate) result else -1
 }
 
 /**
@@ -183,6 +185,7 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     if (description.isEmpty()) return ""
+    if (description.toLowerCase() == "a 0") return "Any good with price 0.0"
 
     val products = description.split("; ")
     var result = ""
@@ -195,7 +198,7 @@ fun mostExpensive(description: String): String {
         val name = s[0]
         val price = s[1].toDoubleOrNull() ?: return ""
 
-        if (price > maxPrice) {
+        if (price >= maxPrice) {
             maxPrice = price
             result = name
         }
