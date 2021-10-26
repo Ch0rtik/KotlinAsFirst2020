@@ -352,15 +352,13 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
                 // Стоимость текущего элемента + стоимость оставшегося пространства
                 var sumPrices = price
                 val allNames = mutableSetOf(entry.key)
-                if (currentBagCapacity > treasureCapacity) {// есть свободное пространство
+                val columnOfRemainingSpace = ((currentBagCapacity - treasureCapacity) / column) - 1
 
-                    val columnOfRemainingSpace = ((currentBagCapacity - treasureCapacity) / column) - 1
+                if (columnOfRemainingSpace >= 0) {
+                    // есть свободное пространство
 
-                    if (columnOfRemainingSpace >= 0) {
-
-                        sumPrices += previousCells[columnOfRemainingSpace].first
-                        allNames.addAll(previousCells[columnOfRemainingSpace].second)
-                    }
+                    sumPrices += previousCells[columnOfRemainingSpace].first
+                    allNames.addAll(previousCells[columnOfRemainingSpace].second)
                 }
 
                 if (sumPrices > previousCells[j].first) currentCells[j] = Pair(sumPrices, allNames)
