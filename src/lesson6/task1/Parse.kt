@@ -150,26 +150,26 @@ fun plusMinus(expression: String): Int = TODO()
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
 fun firstDuplicateIndex(str: String): Int {
-    val text = str.toLowerCase()
-    if (!str.contains(" ")) return -1
-    val words = text.split(" ")
 
-    var result = 0
-    var hasDuplicate = false
-    for ((i, s) in words.withIndex()) {
-        result += s.length
-        if (i == 0) {
-            continue
-        }
-        result++ // пробел
-        if (words[i - 1] == s) {
-            result  -= s.length * 2 + 1
-            hasDuplicate = true
-            break
+    if (str.contains(" ")) {
+        val text = str.toLowerCase()
+        val words = text.split(" ")
+        var result = 0
+
+        for ((i, s) in words.withIndex()) {
+            result += s.length
+            if (i == 0) {
+                continue
+            }
+            result++ // пробел
+            if (words[i - 1] == s) {
+                result -= s.length * 2 + 1
+                return result
+            }
         }
     }
 
-    return if (hasDuplicate) result else -1
+    return -1
 }
 
 /**
@@ -185,7 +185,7 @@ fun firstDuplicateIndex(str: String): Int {
  */
 fun mostExpensive(description: String): String {
     if (description.isEmpty()) return ""
-    if (description.toLowerCase() == "a 0") return "Any good with price 0.0"
+//    if (description.toLowerCase() == "a 0") return "Any good with price 0.0"
 
     val products = description.split("; ")
     var result = ""
