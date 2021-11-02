@@ -451,12 +451,6 @@ fun printMultiplicationProcess(lhv: Int, rhv: Int, outputName: String) {
  *
  */
 
-/*
-fun main() {
-    printDivisionProcess(19935, 22, "temp.txt")
-}
-*/
-
 fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     if (lhv <= 0 || rhv <= 0) return
     val writer = File(outputName).bufferedWriter()
@@ -486,7 +480,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
                     strings.add("".padStart(currentIndexOfRow - getNumberCount(remains) + 1) + remains)
                 }
             }
-        } while (remains / rhv == 0 && currentIndexOfNumberList < numberList.size && strings.size <= 1)
+        } while (remains / rhv == 0 && currentIndexOfNumberList < numberList.size && strings.size == 1)
 
         val tempRes = remains / rhv
         result = result * 10 + tempRes
@@ -496,8 +490,15 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         strings.add("-${dif}".padStart(currentIndexOfRow + 1))
 
         // Подчеркивание
-        strings.add("".padStart(max(currentIndexOfRow - getNumberCount(dif), 0))
-            .let { it.padEnd(it.length + 1 + getNumberCount(dif), '-') })
+        val countNumberRemains = max(
+            getNumberCount(
+                if (remains < 10) remains + 10 // если 09
+                else remains
+            ), getNumberCount(dif) + 1 // если разность + "-" > remains
+        )
+
+        strings.add("".padStart(max(currentIndexOfRow - countNumberRemains + 1, 0))
+            .let { it.padEnd(it.length + countNumberRemains, '-') })
 
         remains -= dif
         currentIndexOfRow = strings[strings.lastIndex].length
