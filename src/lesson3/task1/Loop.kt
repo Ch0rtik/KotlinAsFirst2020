@@ -287,7 +287,6 @@ fun squareSequenceDigit(n: Int): Int {
         currentDigit++
     }
     return 0
-
 }
 
 /**
