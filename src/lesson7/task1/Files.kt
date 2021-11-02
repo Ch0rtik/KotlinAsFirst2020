@@ -458,7 +458,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     val strings = mutableListOf<String>()
     strings.add(" $lhv | $rhv")// Условие
     val countNumberOFRhv = getNumberCount(rhv)
-    val indexOfRhv = strings[0].length - countNumberOFRhv
+    var indexOfRhv = strings[0].length - countNumberOFRhv
     val numberList = getNumberList(lhv)
 
     var currentIndexOfNumberList = 0
@@ -486,6 +486,11 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         result = result * 10 + tempRes
 
         val dif = rhv * tempRes
+        if (strings.size == 1 && getNumberCount(dif) + 1 <= getNumberCount(remains)) {
+            // убирает первый пробел
+            strings[0] = strings[0].trim()
+            indexOfRhv -= 1
+        }
         // Вычитание
         strings.add("-${dif}".padStart(currentIndexOfRow + 1))
 

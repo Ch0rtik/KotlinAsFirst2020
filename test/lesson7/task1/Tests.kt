@@ -10,6 +10,8 @@ class Tests {
     private fun assertFileContent(name: String, expectedContent: String) {
         val file = File(name)
         val content = file.readLines().joinToString("\n")
+        print("$expectedContent\n$content")
+//        println("\n${content[0]}!=${expectedContent[0]}")
         assertEquals(expectedContent, content)
     }
 
@@ -437,6 +439,16 @@ Basic, Ruby, Swift.
                  --
                   0
              """
+        )
+        test(
+            61,
+            64,
+            """
+                 61 | 64
+                 -0   0
+                 --
+                 61
+                 """
         )
 
         File("temp.txt").delete()
