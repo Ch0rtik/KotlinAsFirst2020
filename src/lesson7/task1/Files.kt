@@ -504,7 +504,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
 
     strings[1] += "".padEnd(indexOfRhv - strings[1].length) + result
-    strings.add("".padStart(currentIndexOfRow - 1) + remains)
+    strings.add("".padStart(currentIndexOfRow - getNumberCount(remains)) + remains)
 
     for (i in strings.indices) {
         writer.write(strings[i])
