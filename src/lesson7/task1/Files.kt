@@ -490,6 +490,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             // убирает первый пробел
             strings[0] = strings[0].trim()
             indexOfRhv -= 1
+            currentIndexOfRow = getNumberCount(remains) - 1
         }
         // Вычитание
         strings.add("-${dif}".padStart(currentIndexOfRow + 1))
@@ -506,7 +507,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             .let { it.padEnd(it.length + countNumberRemains, '-') })
 
         remains -= dif
-        currentIndexOfRow = strings[strings.lastIndex].length
+        currentIndexOfRow = strings.last().length
     }
 
     strings[1] += "".padEnd(indexOfRhv - strings[1].length) + result
