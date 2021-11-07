@@ -140,6 +140,7 @@ fun bestHighJump(jumps: String): Int = TODO()
  */
 fun plusMinus(expression: String): Int = TODO()
 
+
 /**
  * Сложная (6 баллов)
  *

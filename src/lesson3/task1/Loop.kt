@@ -79,11 +79,12 @@ fun digitNumber(n: Int): Int {
 
     var count = 0
     var x = abs(n)
-    if (x == 0) return 1
-    while (x > 0) {
+
+    do {
         x /= 10
         count++
-    }
+    } while (x > 0)
+
     return count
 }
 
@@ -112,16 +113,16 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
+//    "Верхнюю границу перебора можно уточнить до sqrt(n)."
+//    Корень из 24 = приблизительно 4, а верняхняя граница должна быть 12, я не понимаю уточнения.
     val mid = n / 2
-    var result = n // на тот случай, если число простое
 
     for (i in 2..mid) {
         if (n % i == 0) {
-            result = i
-            break
+            return i
         }
     }
-    return result
+    return n
 }
 
 /**
@@ -131,14 +132,13 @@ fun minDivisor(n: Int): Int {
  */
 fun maxDivisor(n: Int): Int {
     val mid = n / 2
-    var result = -1 // n <= 1
+
     for (i in mid downTo 1) {
         if (n % i == 0) {
-            result = i
-            break
+            return i
         }
     }
-    return result
+    return -1
 }
 
 /**
@@ -210,7 +210,7 @@ fun isPalindrome(n: Int): Boolean {
             break
         }
     }
-//    return n == revert(n) // Кто же знал...
+//    return n == revert(n) // Кто же знал, что есть такое простое решение
 
     return result
 }
@@ -226,7 +226,6 @@ fun isPalindrome(n: Int): Boolean {
 fun hasDifferentDigits(n: Int): Boolean {
     val numbers = getNumberList(n)
     var previous = -1
-    var result = false
 
     for (i in numbers) {
         if (previous == -1) {
@@ -234,11 +233,10 @@ fun hasDifferentDigits(n: Int): Boolean {
             continue
         }
         if (i != previous) {
-            result = true
-            break
+            return true
         }
     }
-    return result
+    return false
 }
 
 /**

@@ -168,8 +168,10 @@ fun numberRevert(number: Int): Int {
     val ints = getNumberList(number)
 
     var result = 0
+    var degree = 1
     for (i in 0 until ints.size) {
-        result += ints[i] * 10.0.pow(i).toInt()
+        result += ints[i] * degree
+        degree *= 10
     }
     return result
 }
