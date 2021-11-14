@@ -476,8 +476,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             if (strings.size > 1) {
                 strings.add(
                     "".padStart(currentIndexOfRow - digitNumber(remains))
-                            + if (remains < 10) "0" else ""
-                            + remains
+                            + if (remains in 1 until 10) "0$remains" else remains
                 )
             }
 
