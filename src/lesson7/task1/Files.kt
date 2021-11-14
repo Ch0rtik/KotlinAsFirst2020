@@ -3,6 +3,7 @@
 package lesson7.task1
 
 import lesson1.task1.getNumberList
+import lesson3.task1.digitNumber
 import java.io.File
 import kotlin.math.max
 
@@ -456,7 +457,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
 
     val strings = mutableListOf<String>()
     strings.add(" $lhv | $rhv")// Условие
-    val countNumberOFRhv = getNumberCount(rhv)
+    val countNumberOFRhv = digitNumber(rhv)
     var indexOfRhv = strings[0].length - countNumberOFRhv
     val numberList = getNumberList(lhv)
 
@@ -473,7 +474,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             remains += numberList[currentIndexOfNumberList++]
 
             if (strings.size > 1) {
-                var length = currentIndexOfRow - getNumberCount(remains)
+                var length = currentIndexOfRow - digitNumber(remains)
                 var remainsStr = "0$remains"
 
                 if (remains >= 10) {
@@ -490,21 +491,21 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
         result = result * 10 + tempRes
 
         val dif = rhv * tempRes
-        if (strings.size == 1 && getNumberCount(dif) + 1 <= getNumberCount(remains)) {
+        if (strings.size == 1 && digitNumber(dif) + 1 <= digitNumber(remains)) {
             // убирает первый пробел
             strings[0] = strings[0].trim()
             indexOfRhv -= 1
-            currentIndexOfRow = getNumberCount(remains) - 1
+            currentIndexOfRow = digitNumber(remains) - 1
         }
         // Вычитание
         strings.add("-${dif}".padStart(currentIndexOfRow + 1))
 
         // Подчеркивание
         val countNumberRemains = max(
-            getNumberCount(
+            digitNumber(
                 if (remains < 10) remains + 10 // если 09
                 else remains
-            ), getNumberCount(dif) + 1 // если разность + "-" > remains
+            ), digitNumber(dif) + 1 // если разность + "-" > remains
         )
 
         strings.add("".padStart(max(currentIndexOfRow - countNumberRemains + 1, 0))
@@ -515,7 +516,7 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
     }
 
     strings[1] += "".padEnd(indexOfRhv - strings[1].length) + result
-    strings.add("".padStart(currentIndexOfRow - getNumberCount(remains)) + remains)
+    strings.add("".padStart(currentIndexOfRow - digitNumber(remains)) + remains)
 
     val writer = File(outputName).bufferedWriter()
     writer.use {
@@ -524,16 +525,4 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             if (i != strings.lastIndex) it.newLine()
         }
     }
-}
-
-fun getNumberCount(n: Int): Int {
-    if (n == 0) return 1
-
-    var result = 0
-    var x = n
-    while (x > 0) {
-        x /= 10
-        result++
-    }
-    return result
 }
