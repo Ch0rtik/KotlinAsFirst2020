@@ -473,10 +473,15 @@ fun printDivisionProcess(lhv: Int, rhv: Int, outputName: String) {
             remains += numberList[currentIndexOfNumberList++]
 
             if (strings.size > 1) {
-                strings.add(
-                    "".padStart(currentIndexOfRow - getNumberCount(remains))
-                            + if (remains in 1 until 10) "0$remains" else remains
-                )
+                var length = currentIndexOfRow - getNumberCount(remains)
+                var remainsStr = "0$remains"
+
+                if (remains >= 10) {
+                    remainsStr = remainsStr.substring(1)
+                    length++
+                }
+
+                strings.add("".padStart(length) + remainsStr)
             }
 
         } while (remains / rhv == 0 && currentIndexOfNumberList < numberList.size && strings.size == 1)
