@@ -113,9 +113,7 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-//    "Верхнюю границу перебора можно уточнить до sqrt(n)."
-//    Корень из 24 = приблизительно 4, а верняхняя граница должна быть 12, я не понимаю уточнения.
-    val mid = n / 2
+    val mid = sqrt(n.toFloat()).toInt()
 
     for (i in 2..mid) {
         if (n % i == 0) {
@@ -132,13 +130,14 @@ fun minDivisor(n: Int): Int {
  */
 fun maxDivisor(n: Int): Int {
     val mid = n / 2
+    val sqrt = sqrt(n.toFloat()).toInt()
 
-    for (i in mid downTo 1) {
+    for (i in mid downTo sqrt) {
         if (n % i == 0) {
             return i
         }
     }
-    return -1
+    return 1
 }
 
 /**
@@ -210,7 +209,9 @@ fun isPalindrome(n: Int): Boolean {
             break
         }
     }
-//    return n == revert(n) // Кто же знал, что есть такое простое решение
+//    return n == revert(n)
+// Кто же знал, что есть такое простое решение, хотя пока не думал насколько оно корректное для больших чисел.
+// Вроде бы работает, но всё же.
 
     return result
 }
