@@ -113,9 +113,9 @@ fun fib(n: Int): Int {
  * Для заданного числа n > 1 найти минимальный делитель, превышающий 1
  */
 fun minDivisor(n: Int): Int {
-    val mid = sqrt(n.toFloat()).toInt()
+    val sqrt = sqrt(n.toFloat()).toInt()
 
-    for (i in 2..mid) {
+    for (i in 2..sqrt) {
         if (n % i == 0) {
             return i
         }
