@@ -129,12 +129,11 @@ fun minDivisor(n: Int): Int {
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
 fun maxDivisor(n: Int): Int {
-    val mid = n / 2
     val sqrt = sqrt(n.toFloat()).toInt()
 
-    for (i in mid downTo sqrt) {
+    for (i in 2..sqrt) {
         if (n % i == 0) {
-            return i
+            return n / i
         }
     }
     return 1
