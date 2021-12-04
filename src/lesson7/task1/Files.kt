@@ -5,7 +5,9 @@ package lesson7.task1
 import lesson1.task1.getNumberList
 import lesson3.task1.digitNumber
 import java.io.File
+import kotlin.math.ceil
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -147,7 +149,59 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val reader = File(inputName).bufferedReader()
+    val words: ArrayList<Pair<Int, ArrayList<String>>> = arrayListOf()
+    var maxChar = 0
+    //Анализ + Разложение
+    for (line in reader.readLines()) {
+        var countChar = 0
+        val wordsInLine = ArrayList(line.trim().split(" ").mapNotNull {
+            if (it == "") null else {
+                countChar += it.length // суммарная длина всех символов в строке, за исключением пробелов
+                it
+            }
+        })
+        countChar += max(wordsInLine.size - 1, 0)// 1 пробел между каждым словом.
+        if (maxChar < countChar) maxChar = countChar
+        words.add(Pair(countChar, wordsInLine))
+    }
+
+    //Воссоздание
+    val writer = File(outputName).bufferedWriter()
+    writer.use {
+        for ((i, pair) in words.withIndex()) {
+            val lengthLine = pair.first
+            val wordsInLine = pair.second
+            val countWords = wordsInLine.size
+
+            val stringBuilder = StringBuilder()
+            if (wordsInLine.isNotEmpty()) stringBuilder.append(wordsInLine[0])
+
+            if (countWords > 1) {
+                val arrayOfSpace = getArrayOfSpaces(lengthLine, maxChar, countWords)
+                for ((index, space) in arrayOfSpace.withIndex()) {
+                    stringBuilder.append(space).append(wordsInLine[index + 1])
+                }
+            }
+            writer.write(stringBuilder.toString())
+            if (i != words.lastIndex) it.newLine()
+        }
+    }
+}
+
+fun getArrayOfSpaces(lengthLine: Int, lengthMaxLine: Int, countWords: Int): Array<String> {
+    if (countWords <= 1) return arrayOf()
+
+    var countSpaces = countWords - 1
+    var delta = lengthMaxLine - lengthLine + countSpaces //heap of spaces
+
+    return Array(countSpaces) {
+        val i = ceil(delta / countSpaces.toDouble()).toInt()// Округление вверх
+        println("$i $delta $countSpaces")
+        delta -= i
+        countSpaces--
+        "".padEnd(i, ' ')
+    }
 }
 
 /**
