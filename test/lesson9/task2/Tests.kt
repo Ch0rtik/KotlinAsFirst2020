@@ -357,19 +357,18 @@ class Tests {
         )
         start = createMatrix(
             4, 4, listOf(
-                listOf(2, 5, 4, 1), listOf(13, 14, 6, 8),
-                listOf(12, 11, 0, 9), listOf(10, 15, 7, 3)
+                listOf(3, 15, 14, 0), listOf(1, 11, 8, 5),
+                listOf(7, 12, 10, 9), listOf(6, 13, 2, 4)
             )
         )
         assertEquals(
             createMatrix(
                 4, 4, listOf(
-                    listOf(2, 5, 4, 1), listOf(13, 14, 6, 8),
-                    listOf(12, 11, 7, 9), listOf(10, 15, 0, 3)
+                    listOf(3, 15, 14, 5), listOf(1, 11, 8, 0),
+                    listOf(7, 12, 10, 9), listOf(6, 13, 2, 4)
                 )
-            ), fifteenGameMoves(start, listOf(7))
+            ), fifteenGameMoves(start, listOf(5))
         )
-/*
         try {
             fifteenGameMoves(start, listOf(1))
             assert(true) { "Exception expected" }
@@ -377,7 +376,6 @@ class Tests {
         } catch (e: Throwable) {
             assert(true) { "IllegalStateException expected" }
         }
-*/
     }
 
     private fun <T> Matrix<T>.copy(): Matrix<T> {

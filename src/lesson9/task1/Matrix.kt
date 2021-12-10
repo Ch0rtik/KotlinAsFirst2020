@@ -51,7 +51,7 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl(widt
  *
  * Реализация интерфейса "матрица"
  */
-data class MatrixImpl<E>(override val width: Int, override val height: Int, val defaultValue: E) : Matrix<E> {
+class MatrixImpl<E>(override val width: Int, override val height: Int, val defaultValue: E) : Matrix<E> {
     init {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Weight or height must be > 0")
     }
@@ -89,6 +89,20 @@ data class MatrixImpl<E>(override val width: Int, override val height: Int, val 
 
     override fun set(cell: Cell, value: E) {
         set(cell.row, cell.column, value)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if ((other as? Matrix<*>) != null){
+            if (width != other.width || height != other.height) return false
+            for ((i, v) in data.withIndex()){
+                if (data[i] != v) return false
+            }
+        }
+        return true
+    }
+
+    override fun toString(): String {
+        return data.toString()
     }
 }
 
