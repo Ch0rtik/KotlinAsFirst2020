@@ -45,14 +45,18 @@ interface Matrix<E> {
  * height = высота, width = ширина, e = чем заполнить элементы.
  * Бросить исключение IllegalArgumentException, если height или width <= 0.
  */
-fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl(width, height, e)
+fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E>{
+    val matrix = MatrixImpl<E>(width, height)
+    matrix.init(e)
+    return matrix
+}
 
 /**
  * Средняя сложность (считается двумя задачами в 3 балла каждая)
  *
  * Реализация интерфейса "матрица"
  */
-class MatrixImpl<E>(override val width: Int, override val height: Int, val defaultValue: E) : Matrix<E> {
+class MatrixImpl<E>(override val width: Int, override val height: Int) : Matrix<E> {
     companion object {
         fun indexToCell(index: Int, height: Int): Cell = Cell(index / height, index % height)
 
@@ -67,7 +71,7 @@ class MatrixImpl<E>(override val width: Int, override val height: Int, val defau
 
     private val data = mutableListOf<E>()
 
-    init {
+    fun init(defaultValue: E) {
         for (row in 0 until height * width) {
             data.add(defaultValue)
         }
@@ -116,6 +120,13 @@ class MatrixImpl<E>(override val width: Int, override val height: Int, val defau
 
     override fun toString(): String {
         return data.toString()
+    }
+
+    override fun hashCode(): Int {
+        var result = width
+        result = 31 * result + height
+        result = 31 * result + data.hashCode()
+        return result
     }
 }
 

@@ -248,33 +248,6 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-private fun <E> createMatrix(height: Int, width: Int, values: List<List<E>>): Matrix<E> {
-    val matrix = createMatrix(height, width, values[0][0])
-    for (row in 0 until height) {
-        for (column in 0 until width) {
-            matrix[row, column] = values[row][column]
-        }
-    }
-    return matrix
-}
-
-fun main() {
-    val start = lesson9.task2.createMatrix(
-        4, 4, listOf(
-            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
-            listOf(9, 10, 11, 12), listOf(13, 14, 15, 0)
-        )
-    )
-    val end = lesson9.task2.createMatrix(
-        4, 4, listOf(
-            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
-            listOf(9, 10, 11, 2), listOf(13, 14, 15, 0)
-        )
-    )
-    print(start == end)
-    /*
-    fifteenGameMoves(start, listOf(1))*/
-}
 
 fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
     // 1) Найти index нуля в Cell.
@@ -300,7 +273,8 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
         if (currentIndex == -1) throw IllegalArgumentException()
 
         matrix[indexToCell(zeroPosition, matrix.height)] = it
-        matrix[indexToCell(zeroPosition, matrix.height)] = 0
+        matrix[indexToCell(currentIndex, matrix.height)] = 0
+        zeroPosition = currentIndex
     }
 
     return matrix
