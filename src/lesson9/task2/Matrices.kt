@@ -306,20 +306,15 @@ fun rowAndColumnToIndex(row: Int, column: Int, width: Int): Int = row * width + 
 
 fun getIndexOfValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
     val ways = arrayOf(
-        if (currentIndex % matrix.width == 0)
-            currentIndex + matrix.width - 1 else currentIndex - 1,//left
-
-        if (currentIndex < matrix.width)
-            matrix.width * (matrix.height - 1) + currentIndex else currentIndex - matrix.width, //top
-
-        if (currentIndex % matrix.width == matrix.width - 1)
-            currentIndex - matrix.width + 1 else currentIndex + 1,//right
-
-        if (currentIndex > matrix.width * (matrix.height - 1))
-            currentIndex - (matrix.width * (matrix.height - 1)) else currentIndex + matrix.width//bottom
+        currentIndex - 1,//left
+        currentIndex - matrix.width, //top
+        currentIndex + 1,//right
+        currentIndex + matrix.width//bottom
     )
 
     for (index in ways) {
+        if (index >= matrix.width * matrix.height || index < 0) continue
+
         if (matrix[indexToCell(index, matrix.height)] == value)
             return index
     }

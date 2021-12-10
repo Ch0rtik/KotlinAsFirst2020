@@ -65,15 +65,15 @@ data class MatrixImpl<E>(override val width: Int, override val height: Int, val 
     }
 
     override fun get(row: Int, column: Int): E {
-        indexIsExist(row, column)
+        if (!indexIsExist(row, column)) {
+            throw IllegalArgumentException("The cell ${(width * row) + column} not exist")
+        }
         return data[(width * row) + column]
     }
 
-    private fun indexIsExist(row: Int, column: Int) {
+    private fun indexIsExist(row: Int, column: Int): Boolean {
         val index = (width * row) + column
-        if (index >= width * height || index < 0) {
-            throw IllegalArgumentException("The cell $index not exist")
-        }
+        return !(index >= width * height || index < 0)
     }
 
     override fun get(cell: Cell): E {
@@ -81,7 +81,9 @@ data class MatrixImpl<E>(override val width: Int, override val height: Int, val 
     }
 
     override fun set(row: Int, column: Int, value: E) {
-        indexIsExist(row, column)
+        if (!indexIsExist(row, column)) {
+            throw IllegalArgumentException("The cell ${(width * row) + column} not exist")
+        }
         data[(width * row) + column] = value
     }
 
