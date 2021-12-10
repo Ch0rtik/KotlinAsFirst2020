@@ -2,6 +2,7 @@
 
 package lesson9.task2
 
+import lesson9.task1.Cell
 import lesson9.task1.Matrix
 import lesson9.task1.createMatrix
 
@@ -245,7 +246,86 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
-fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> = TODO()
+private fun <E> createMatrix(height: Int, width: Int, values: List<List<E>>): Matrix<E> {
+    val matrix = createMatrix(height, width, values[0][0])
+    for (row in 0 until height) {
+        for (column in 0 until width) {
+            matrix[row, column] = values[row][column]
+        }
+    }
+    return matrix
+}
+
+fun main() {
+    val start = lesson9.task2.createMatrix(
+        4, 4, listOf(
+            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
+            listOf(9, 10, 11, 12), listOf(13, 14, 15, 0)
+        )
+    )
+    println(getIndexOfValue(15,1,start))
+    /*
+    fifteenGameMoves(start, listOf(1))*/
+}
+
+fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
+    // 1) Найти index нуля в Cell.
+    // 2) Цикл foreach для moves
+    // 3) Вернуть измененныую матрицу
+//    val countCells = matrix.width * matrix.height
+    if (moves.isEmpty()) return matrix
+
+    var zeroPosition = -1
+    for (row in 0 until matrix.height) {
+        for (column in 0 until matrix.width) {
+            if (matrix[row, column] == 0)
+                zeroPosition = rowAndColumnToIndex(row, column, matrix.width)
+        }
+    }
+    if (zeroPosition == -1) throw IllegalArgumentException()
+
+    var currentIndex = zeroPosition
+    moves.forEach {
+        if (it !in 1..15) throw IllegalArgumentException()
+        currentIndex = getIndexOfValue(currentIndex, it, matrix)
+
+        if (currentIndex == -1) throw IllegalArgumentException()
+
+        matrix[indexToCell(zeroPosition, matrix.height)] = it
+        matrix[indexToCell(zeroPosition, matrix.height)] = 0
+    }
+
+    return matrix
+}
+
+fun indexToCell(index: Int, height: Int): Cell = Cell(index / height, index % height)
+
+fun cellToIndex(cell: Cell, width: Int): Int = rowAndColumnToIndex(cell.row, cell.column, width)
+
+fun rowAndColumnToIndex(row: Int, column: Int, width: Int): Int = row * width + column
+
+fun getIndexOfValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
+    val ways = arrayOf(
+        if (currentIndex % matrix.width == 0)
+            currentIndex + matrix.width - 1 else currentIndex - 1,//left
+
+        if (currentIndex < matrix.width)
+            matrix.width * (matrix.height - 1) + currentIndex else currentIndex - matrix.width, //top
+
+        if (currentIndex % matrix.width == matrix.width - 1)
+            currentIndex - matrix.width + 1 else currentIndex + 1,//right
+
+        if (currentIndex > matrix.width * (matrix.height - 1))
+            currentIndex - (matrix.width * (matrix.height - 1)) else currentIndex + matrix.width//bottom
+    )
+
+    for (index in ways) {
+        if (matrix[indexToCell(index, matrix.height)] == value)
+            return index
+    }
+
+    return -1
+}
 
 /**
  * Очень сложная (32 балла)

@@ -161,6 +161,7 @@ fun alignFileByWidth(inputName: String, outputName: String) {
                 it
             }
         })
+
         countChar += max(wordsInLine.size - 1, 0)// 1 пробел между каждым словом.
         if (maxChar < countChar) maxChar = countChar
         words.add(Pair(countChar, wordsInLine))
@@ -197,7 +198,7 @@ fun getArrayOfSpaces(lengthLine: Int, lengthMaxLine: Int, countWords: Int): Arra
 
     return Array(countSpaces) {
         val i = ceil(delta / countSpaces.toDouble()).toInt()// Округление вверх
-        println("$i $delta $countSpaces")
+//        println("$i $delta $countSpaces")
         delta -= i
         countSpaces--
         "".padEnd(i, ' ')

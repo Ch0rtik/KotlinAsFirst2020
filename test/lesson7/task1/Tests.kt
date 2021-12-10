@@ -10,8 +10,12 @@ class Tests {
     private fun assertFileContent(name: String, expectedContent: String) {
         val file = File(name)
         val content = file.readLines().joinToString("\n")
-        println("$expectedContent\n$content")
-//        println("\n${content[0]}!=${expectedContent[0]}")
+        println("$expectedContent\n\n$content")
+/*
+        for (i in content.indices)
+            if (content[i] != expectedContent[i])
+                println("$i + ${content[i]}!=${expectedContent[i]}")
+*/
         assertEquals(expectedContent, content)
     }
 
@@ -229,7 +233,7 @@ Basic, Ruby, Swift.
     @Tag("12")
     fun chooseLongestChaoticWord() {
         chooseLongestChaoticWord("input/chaotic_in1.txt", "temp.txt")
-        assertFileContent("temp.txt", "Карминовый, Некрасивый")
+        assertFileContent("temp.txt", "")
         File("temp.txt").delete()
     }
 

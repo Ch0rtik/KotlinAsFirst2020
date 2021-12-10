@@ -120,7 +120,7 @@ class Tests {
 
     @Test
     @Tag("2")
-    fun containsIn() {
+    fun digitNumber() {
         assertTrue(containsIn(mapOf("a" to "z"), mapOf("a" to "z", "b" to "sweet")))
         assertFalse(containsIn(mapOf("a" to "z"), mapOf("a" to "zee", "b" to "sweet")))
     }
