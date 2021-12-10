@@ -4,6 +4,8 @@ package lesson9.task2
 
 import lesson9.task1.Cell
 import lesson9.task1.Matrix
+import lesson9.task1.MatrixImpl.Companion.indexToCell
+import lesson9.task1.MatrixImpl.Companion.rowAndColumnToIndex
 import lesson9.task1.createMatrix
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
@@ -246,11 +248,39 @@ fun canOpenLock(key: Matrix<Int>, lock: Matrix<Int>): Triple<Boolean, Int, Int> 
  * 0  4 13  6
  * 3 10 11  8
  */
+private fun <E> createMatrix(height: Int, width: Int, values: List<List<E>>): Matrix<E> {
+    val matrix = createMatrix(height, width, values[0][0])
+    for (row in 0 until height) {
+        for (column in 0 until width) {
+            matrix[row, column] = values[row][column]
+        }
+    }
+    return matrix
+}
+
+fun main() {
+    val start = lesson9.task2.createMatrix(
+        4, 4, listOf(
+            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
+            listOf(9, 10, 11, 12), listOf(13, 14, 15, 0)
+        )
+    )
+    val end = lesson9.task2.createMatrix(
+        4, 4, listOf(
+            listOf(1, 2, 3, 4), listOf(5, 6, 7, 8),
+            listOf(9, 10, 11, 2), listOf(13, 14, 15, 0)
+        )
+    )
+    print(start == end)
+    /*
+    fifteenGameMoves(start, listOf(1))*/
+}
 
 fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
     // 1) Найти index нуля в Cell.
     // 2) Цикл foreach для moves
     // 3) Вернуть измененныую матрицу
+//    val countCells = matrix.width * matrix.height
     if (moves.isEmpty()) return matrix
 
     var zeroPosition = -1
@@ -275,12 +305,6 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
 
     return matrix
 }
-
-fun indexToCell(index: Int, height: Int): Cell = Cell(index / height, index % height)
-
-fun cellToIndex(cell: Cell, width: Int): Int = rowAndColumnToIndex(cell.row, cell.column, width)
-
-fun rowAndColumnToIndex(row: Int, column: Int, width: Int): Int = row * width + column
 
 fun getIndexOfValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
     val ways = arrayOf(

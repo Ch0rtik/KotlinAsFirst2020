@@ -10,6 +10,7 @@ package lesson9.task1
  */
 data class Cell(val row: Int, val column: Int)
 
+
 /**
  * Интерфейс, описывающий возможности матрицы. E = тип элемента матрицы
  */
@@ -52,6 +53,14 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> = MatrixImpl(widt
  * Реализация интерфейса "матрица"
  */
 class MatrixImpl<E>(override val width: Int, override val height: Int, val defaultValue: E) : Matrix<E> {
+    companion object {
+        fun indexToCell(index: Int, height: Int): Cell = Cell(index / height, index % height)
+
+        fun cellToIndex(cell: Cell, width: Int): Int = rowAndColumnToIndex(cell.row, cell.column, width)
+
+        fun rowAndColumnToIndex(row: Int, column: Int, width: Int): Int = row * width + column
+    }
+
     init {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Weight or height must be > 0")
     }
@@ -80,6 +89,10 @@ class MatrixImpl<E>(override val width: Int, override val height: Int, val defau
         return get(cell.row, cell.column)
     }
 
+    fun get(index: Int): E {
+        return get(indexToCell(index, height))
+    }
+
     override fun set(row: Int, column: Int, value: E) {
         if (!indexIsExist(row, column)) {
             throw IllegalArgumentException("The cell ${(width * row) + column} not exist")
@@ -92,10 +105,10 @@ class MatrixImpl<E>(override val width: Int, override val height: Int, val defau
     }
 
     override fun equals(other: Any?): Boolean {
-        if ((other as? Matrix<*>) != null){
+        if ((other as? Matrix<*>) != null) {
             if (width != other.width || height != other.height) return false
-            for ((i, v) in data.withIndex()){
-                if (data[i] != v) return false
+            for ((i, v) in data.withIndex()) {
+                if (other[indexToCell(i, height)] != v) return false
             }
         }
         return true
