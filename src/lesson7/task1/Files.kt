@@ -7,7 +7,6 @@ import lesson3.task1.digitNumber
 import java.io.File
 import kotlin.math.ceil
 import kotlin.math.max
-import kotlin.math.roundToInt
 
 // Урок 7: работа с файлами
 // Урок интегральный, поэтому его задачи имеют сильно увеличенную стоимость
@@ -97,7 +96,37 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val reader = File(inputName).bufferedReader()
+    val writer = File(outputName).bufferedWriter()
+    for (line in reader.lines()) {
+        val charArray = line.trim().toCharArray()
+        for (i in charArray.indices) {
+            if (i == charArray.lastIndex) break
+            if (Regex("[жшчщ]", RegexOption.IGNORE_CASE).matches(charArray[i].toString())) {
+                var needToUpperCase = false
+                val nextChar = charArray[i + 1].toLowerCase()
+                if (nextChar == 'ы') {
+                    needToUpperCase = charArray[i + 1].isUpperCase()
+                    charArray[i + 1] = 'и'
+                }
+                if (nextChar == 'я') {
+                    needToUpperCase = charArray[i + 1].isUpperCase()
+                    charArray[i + 1] = 'а'
+                }
+                if (nextChar == 'ю') {
+                    needToUpperCase = charArray[i + 1].isUpperCase()
+                    charArray[i + 1] = 'у'
+                }
+                if (needToUpperCase){
+                    charArray[i + 1] = charArray[i + 1].toUpperCase()
+                }
+            }
+        }
+
+        writer.write(String(charArray))
+        writer.newLine()
+    }
+    writer.close()
 }
 
 /**

@@ -2,7 +2,6 @@
 
 package lesson9.task2
 
-import lesson9.task1.Cell
 import lesson9.task1.Matrix
 import lesson9.task1.MatrixImpl.Companion.indexToCell
 import lesson9.task1.MatrixImpl.Companion.rowAndColumnToIndex
@@ -256,14 +255,7 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
 //    val countCells = matrix.width * matrix.height
     if (moves.isEmpty()) return matrix
 
-    var zeroPosition = -1
-    for (row in 0 until matrix.height) {
-        for (column in 0 until matrix.width) {
-            if (matrix[row, column] == 0)
-                zeroPosition = rowAndColumnToIndex(row, column, matrix.width)
-        }
-    }
-    if (zeroPosition == -1) throw IllegalArgumentException()
+    var zeroPosition = getPosition(0, matrix)
 
     var currentIndex = zeroPosition
     moves.forEach {
@@ -278,6 +270,18 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
     }
 
     return matrix
+}
+
+private fun getPosition(value: Int, matrix: Matrix<Int>): Int {
+    var zeroPosition = -1
+    for (row in 0 until matrix.height) {
+        for (column in 0 until matrix.width) {
+            if (matrix[row, column] == value)
+                zeroPosition = rowAndColumnToIndex(row, column, matrix.width)
+        }
+    }
+    if (zeroPosition == -1) throw IllegalArgumentException()
+    return zeroPosition
 }
 
 fun getIndexOfValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
@@ -337,4 +341,8 @@ fun getIndexOfValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
  *
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
-fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> = TODO()
+fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+    /*if (matrix.width == 0 || matrix.height == 0) throw IllegalArgumentException()
+    var zeroPosition = getZeroPosition(matrix)*/
+    TODO()
+}
