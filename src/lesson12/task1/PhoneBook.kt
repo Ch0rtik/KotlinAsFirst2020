@@ -55,6 +55,9 @@ class PhoneBook {
         if (!phoneBook.containsKey(name)) return false
         val phones = phoneBook[name] ?: return false
         if (phones.contains(phone)) return false
+        for (set in phoneBook.values) {
+            if (set.contains(phone)) return false
+        }
         phones.add(phone)
         return true
     }
@@ -78,7 +81,6 @@ class PhoneBook {
      * Если этого человека нет в книге, вернуть пустой список
      */
     fun phones(name: String): Set<String> {
-
         if (!phoneBook.containsKey(name)) return setOf()
         return phoneBook[name] ?: setOf()
     }
