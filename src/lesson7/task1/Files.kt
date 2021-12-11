@@ -99,7 +99,7 @@ fun sibilants(inputName: String, outputName: String) {
     val reader = File(inputName).bufferedReader()
     val writer = File(outputName).bufferedWriter()
     for (line in reader.lines()) {
-        val charArray = line.trim().toCharArray()
+        val charArray = line.toCharArray()
         for (i in charArray.indices) {
             if (i == charArray.lastIndex) break
             if (Regex("[жшчщ]", RegexOption.IGNORE_CASE).matches(charArray[i].toString())) {
