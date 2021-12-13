@@ -397,12 +397,12 @@ fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
     val planOfValues = getPlanOfValues(isCorrectVariant(matrix, (voidPosition / matrix.width)))
 
     for (i in 0 until 15) {
-        if (i == 10) break
+        if (i == 12) break
         if (i != 0) voidPosition = getPosition(0, data)
         val currentPosition = getPosition(planOfValues[i], data)
         val targetPosition = planOfPosition[i] - 1
 
-        println("New round $i $data")
+        println("New round $i planOfValues[i] ${planOfValues[i]} $data")
         if (currentPosition == targetPosition) {
             // Если уже занимает правильную позицию
             println("Luck $currentPosition")
@@ -534,6 +534,22 @@ fun moveIfPossible( // Сторит тракторию, проверяет ее 
 
     if (trajectory.isEmpty()) {
         return if (targetPosition != actualCurrentPosition) {
+            //TODO
+            /*actualTargetPosition = getGuidingPosition(actualCurrentPosition, targetPosition, matrix.width)
+            println("actualTargetPosition $actualTargetPosition")
+            trajectory = getTrajectory(
+                actualCurrentPosition, actualTargetPosition,
+                actualVoidPosition, listWithReadyPosition, matrix
+            )
+
+            actualVoidPosition = moveVoidTo(trajectory, actualVoidPosition, log, data) // Доводит до current
+            val tmp = actualVoidPosition
+            actualVoidPosition =
+                simpleMove(actualCurrentPosition, actualVoidPosition, log, data) // меняет местами с current
+            actualCurrentPosition = tmp
+            println("actualVoidPosition $actualVoidPosition")
+            println("actualCurrentPosition $actualCurrentPosition")*/
+
             unNamedMove(
                 targetPosition,
                 matrix,
@@ -619,7 +635,7 @@ private fun unNamedMove(
 
     actualVoidPosition = moveVoidTo(trajectory, actualVoidPosition, log, data)
     var tmp = actualVoidPosition
-    if (trajectory.isNotEmpty())actualVoidPosition = simpleMove(actualCurrentPosition, actualVoidPosition, log, data)
+    actualVoidPosition = simpleMove(actualCurrentPosition, actualVoidPosition, log, data)
     println("data1 $data")
 
     actualVoidPosition = rotateFourCells(actualVoidPosition, isVertical, 1, matrix.width, log, data)
@@ -666,7 +682,6 @@ fun rotateFourCells(
     log: MutableList<Int>,
     data: MutableMap<Int, Int>
 ): Int {
-
     val top = voidPosition - width
     val tLeft = top - 1
     val left = voidPosition - 1
@@ -742,9 +757,9 @@ fun getTrajectory( // Возращает позиции, по которым д�
 
     // Стандартная реализация
     if ((rowDelta != 0 &&
-                ((targetCell.column == voidCell.column && targetCell.column == currentCell.column) /*&& (targetCell.row == currentCell.row && targetCell.row == voidCell.row)*/)) ||
+                ((targetCell.column == voidCell.column && targetCell.column == currentCell.column))) ||
         (columnDelta != 0 &&
-                ((targetCell.row == voidCell.row && targetCell.row == currentCell.row) /*&& (targetCell.column == currentCell.column && targetCell.column == voidCell.column)*/))
+                ((targetCell.row == voidCell.row && targetCell.row == currentCell.row)))
     ) {
         rowDelta = targetCell.row - currentCell.row
         columnDelta = targetCell.column - currentCell.column
@@ -767,7 +782,6 @@ fun getTrajectory( // Возращает позиции, по которым д�
         )
 
     } else {
-
         println("voidPosition $voidPosition columnDelta $columnDelta rowDelta $rowDelta currentPosition $currentPosition")
         if (voidPosition + columnDelta == currentPosition && abs(rowDelta) > 0) { // Если Void и Current на одной строке
             actualVoidPosition += rowDelta / abs(rowDelta) * matrix.width
