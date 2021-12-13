@@ -29,6 +29,10 @@ interface Matrix<E> {
 
     operator fun get(cell: Cell): E
 
+    operator fun get(index: Int): E
+
+    fun get(): MutableMap<Int,E>
+
     /**
      * Запись в ячейку.
      * Методы могут бросить исключение, если ячейка не существует
@@ -45,7 +49,7 @@ interface Matrix<E> {
  * height = высота, width = ширина, e = чем заполнить элементы.
  * Бросить исключение IllegalArgumentException, если height или width <= 0.
  */
-fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E>{
+fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E> {
     val matrix = MatrixImpl<E>(width, height)
     matrix.init(e)
     return matrix
@@ -58,34 +62,34 @@ fun <E> createMatrix(height: Int, width: Int, e: E): Matrix<E>{
  */
 class MatrixImpl<E>(override val width: Int, override val height: Int) : Matrix<E> {
     companion object {
-        fun indexToCell(index: Int, height: Int): Cell = Cell(index / height, index % height)
+        fun toCell(index: Int, height: Int): Cell = Cell(index / height, index % height)
 
-        fun cellToIndex(cell: Cell, width: Int): Int = rowAndColumnToIndex(cell.row, cell.column, width)
+        fun toIndex(cell: Cell, width: Int): Int = toIndex(cell.row, cell.column, width)
 
-        fun rowAndColumnToIndex(row: Int, column: Int, width: Int): Int = row * width + column
+        fun toIndex(row: Int, column: Int, width: Int): Int = row * width + column
     }
 
     init {
         if (width <= 0 || height <= 0) throw IllegalArgumentException("Weight or height must be > 0")
     }
 
-    private val data = mutableListOf<E>()
+    private val data = mutableMapOf<Int, E>()
 
     fun init(defaultValue: E) {
-        for (row in 0 until height * width) {
-            data.add(defaultValue)
+        for (i in 0 until height * width) {
+            data[i] = (defaultValue)
         }
     }
 
     override fun get(row: Int, column: Int): E {
         if (!indexIsExist(row, column)) {
-            throw IllegalArgumentException("The cell ${(width * row) + column} not exist")
+            throw IllegalArgumentException("The cell ${toIndex(row, column, width)} not exist")
         }
-        return data[(width * row) + column]
+        return data[toIndex(row, column, width)]!!
     }
 
     private fun indexIsExist(row: Int, column: Int): Boolean {
-        val index = (width * row) + column
+        val index = toIndex(row, column, width)
         return !(index >= width * height || index < 0)
     }
 
@@ -93,15 +97,20 @@ class MatrixImpl<E>(override val width: Int, override val height: Int) : Matrix<
         return get(cell.row, cell.column)
     }
 
-    fun get(index: Int): E {
-        return get(indexToCell(index, height))
+    override fun get(index: Int): E {
+        if ((index >= width * height || index < 0)) throw IllegalArgumentException("The index $index not exist")
+        return data[index]!!
+    }
+
+    override fun get(): MutableMap<Int, E> {
+        return data
     }
 
     override fun set(row: Int, column: Int, value: E) {
         if (!indexIsExist(row, column)) {
-            throw IllegalArgumentException("The cell ${(width * row) + column} not exist")
+            throw IllegalArgumentException("The cell ${toIndex(row, column, width)} not exist")
         }
-        data[(width * row) + column] = value
+        data[toIndex(row, column, width)] = value
     }
 
     override fun set(cell: Cell, value: E) {
@@ -111,8 +120,8 @@ class MatrixImpl<E>(override val width: Int, override val height: Int) : Matrix<
     override fun equals(other: Any?): Boolean {
         if ((other as? Matrix<*>) != null) {
             if (width != other.width || height != other.height) return false
-            for ((i, v) in data.withIndex()) {
-                if (other[indexToCell(i, height)] != v) return false
+            for ((i, v) in data) {
+                if (other[i] != v) return false
             }
         }
         return true

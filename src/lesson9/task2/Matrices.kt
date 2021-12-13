@@ -2,10 +2,12 @@
 
 package lesson9.task2
 
+import lesson9.task1.Cell
 import lesson9.task1.Matrix
-import lesson9.task1.MatrixImpl.Companion.indexToCell
-import lesson9.task1.MatrixImpl.Companion.rowAndColumnToIndex
+import lesson9.task1.MatrixImpl.Companion.toCell
+import lesson9.task1.MatrixImpl.Companion.toIndex
 import lesson9.task1.createMatrix
+import kotlin.math.abs
 
 // Все задачи в этом файле требуют наличия реализации интерфейса "Матрица" в Matrix.kt
 
@@ -255,51 +257,58 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
 //    val countCells = matrix.width * matrix.height
     if (moves.isEmpty()) return matrix
 
-    var zeroPosition = getPosition(0, matrix)
+    var voidPosition = getPosition(0, matrix.get())
 
-    var currentIndex = zeroPosition
+    var currentIndex = voidPosition
     moves.forEach {
         if (it !in 1..15) throw IllegalArgumentException()
-        currentIndex = getIndexOfValue(currentIndex, it, matrix)
+        currentIndex = getIndexToValue(currentIndex, it, matrix)
 
-        if (currentIndex == -1) throw IllegalArgumentException()
-
-        matrix[indexToCell(zeroPosition, matrix.height)] = it
-        matrix[indexToCell(currentIndex, matrix.height)] = 0
-        zeroPosition = currentIndex
+        print("$it ")
+        if (currentIndex == -1) {
+            println(moves)
+            throw IllegalArgumentException("$it")
+        }
+        voidPosition = simpleMove(currentIndex, voidPosition, null, matrix.get())
     }
-
     return matrix
 }
 
-private fun getPosition(value: Int, matrix: Matrix<Int>): Int {
-    var zeroPosition = -1
-    for (row in 0 until matrix.height) {
-        for (column in 0 until matrix.width) {
-            if (matrix[row, column] == value)
-                zeroPosition = rowAndColumnToIndex(row, column, matrix.width)
+private fun getPosition(value: Int, data: MutableMap<Int, Int>): Int {
+    var position = -1
+    for (index in 0 until data.size) {
+        if (data[index] == value) {
+            position = index
+            break
         }
     }
-    if (zeroPosition == -1) throw IllegalArgumentException()
-    return zeroPosition
+    if (position == -1) throw IllegalArgumentException("value $value")
+    return position
 }
 
-fun getIndexOfValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
-    val ways = arrayOf(
-        currentIndex - 1,//left
-        currentIndex - matrix.width, //top
-        currentIndex + 1,//right
-        currentIndex + matrix.width//bottom
-    )
+fun getIndexToValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
+    val ways = getNeighbors(currentIndex, matrix.width, matrix.height)
 
     for (index in ways) {
-        if (index >= matrix.width * matrix.height || index < 0) continue
+        if (isIllegalIndex(index, matrix)) continue
 
-        if (matrix[indexToCell(index, matrix.height)] == value)
+        if (matrix[index] == value)
             return index
     }
 
     return -1
+}
+
+private fun isIllegalIndex(index: Int, matrix: Matrix<Int>) =
+    index >= matrix.width * matrix.height || index < 0
+
+private fun getNeighbors(currentIndex: Int, width: Int, height: Int): Array<Int> {
+    return arrayOf(
+        if (currentIndex % width == 0) -1 else currentIndex - 1,//left
+        currentIndex - width, //top
+        if (currentIndex % width == 3) -1 else currentIndex + 1,//right
+        currentIndex + width//bottom
+    )
 }
 
 /**
@@ -341,8 +350,482 @@ fun getIndexOfValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
  *
  * Перед решением этой задачи НЕОБХОДИМО решить предыдущую
  */
+fun <E> createMatrix(height: Int, width: Int, values: List<List<E>>): Matrix<E> {
+    val matrix = createMatrix(height, width, values[0][0])
+    for (row in 0 until height) {
+        for (column in 0 until width) {
+            matrix[row, column] = values[row][column]
+        }
+    }
+    return matrix
+}
+
+fun main() {
+    val matrix = lesson9.task2.createMatrix(
+        4, 4, listOf(
+            listOf(0, 1, 2, 3),
+            listOf(4, 5, 6, 7),
+            listOf(8, 9, 10, 11),
+            listOf(12, 13, 14, 15)
+        )
+    )
+    println(fifteenGameSolution(matrix))
+}
+
 fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
-    /*if (matrix.width == 0 || matrix.height == 0) throw IllegalArgumentException()
-    var zeroPosition = getZeroPosition(matrix)*/
-    TODO()
+    // По большей части я использовал след. приемы для решения головоломки:
+    // 1) вращение окружающих цифр для прохода текущей цифры к своему месту;
+    // 2) перемещения нуля к текущей цифре, в зону его радиуса (3х3);
+    // 3) прием для прямоугольника 2х3, когда место текущей цифры есть краняя колонка в ряду.
+    // 4) просто вращение 3 цифр по квадрату 2х2
+    // Используя эти техники можно решить любую подобную головоломку, количество ячеек в которой есть квадрат числа.
+    // План прохода:
+    // Сперва заполняются верхние ряды не включая нижние два. С крайними правыми ячейчами в ряду используется прием 3
+    // Когда останутся 2 нижних ряда, необходимо заполнять сперва крайнюю левую ячейку у предпоследнего ряда, затем у последнего.
+    // Повторять пока ячеек сумарно не останется 3. Затем их достаточно просто повращать.
+
+    if (matrix.width <= 0 || matrix.height <= 0) throw IllegalArgumentException()
+    if (!dataIsCorrect(matrix)) throw IllegalArgumentException("Incorrect data")
+
+    val data = mutableMapOf<Int, Int>()
+    data.putAll(matrix.get())
+
+    val listWithReadyPosition = Array(matrix.width * matrix.height) { false }
+    val log = mutableListOf<Int>()
+    val planOfPosition = listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 10, 14, 11, 12, 15)
+    var voidPosition = getPosition(0, data)
+    val planOfValues = getPlanOfValues(isCorrectVariant(matrix, (voidPosition / matrix.width)))
+
+    for (i in 0 until 15) {
+        if (i == 10) break
+        if (i != 0) voidPosition = getPosition(0, data)
+        val currentPosition = getPosition(planOfValues[i], data)
+        val targetPosition = planOfPosition[i] - 1
+
+        println("New round $i $data")
+        if (currentPosition == targetPosition) {
+            // Если уже занимает правильную позицию
+            println("Luck $currentPosition")
+            listWithReadyPosition[targetPosition] = true
+            continue
+        }
+
+        if (!moveIfPossible(
+                currentPosition,
+                targetPosition,
+                voidPosition,
+                listWithReadyPosition,
+                log,
+                data,
+                matrix
+            )
+        ) {
+            throw IllegalArgumentException()
+        }
+        listWithReadyPosition[targetPosition] = true
+    }
+    println(matrix.get())
+    println(data)
+    return log
+}
+
+fun dataIsCorrect(matrix: Matrix<Int>): Boolean {
+    val set = mutableSetOf<Int>()
+    set.addAll(matrix.get().values)
+    if (set.size != matrix.width * matrix.height) {
+        return false
+    }
+    for (v in set) {
+        if (isIllegalIndex(v, matrix)) return false
+    }
+    return true
+}
+
+fun isCorrectVariant(matrix: Matrix<Int>, zeroRow: Int): Boolean {
+    var sum = zeroRow + 1 // учитывая нумерацию с нуля
+    val end = matrix.height * matrix.width
+    for (i in 0 until end) {
+        for (j in i + 1 until end - 1) {
+            if (matrix[i] > matrix[i + 1]) {
+                sum++
+            }
+        }
+    }
+    return sum % 2 == 0
+}
+
+private fun getPlanOfValues(isCorrectVariant: Boolean): List<Int> {
+    val list = mutableListOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 13, 10, 14, 11, 12, 15)
+    if (!isCorrectVariant) {
+        list[11] = 15
+        list[14] = 14
+    }
+    return list
+}
+
+fun rotateTrajectory(
+// Вращает стрелки (передвигает) квадратную границу
+    startPosition: Int, // Позиция нуля
+    endPosition: Int,
+    centerPosition: Int, // Если ноль центра нет, то вращаются 4 квадрата
+    listWithReadyPosition: Array<Boolean>,
+    matrix: Matrix<Int>
+): List<Int> {
+    val result = mutableListOf<Int>()
+    val nearPositions = getNearPosition(centerPosition, matrix.width)
+    val startInNearPosition = nearPositions.indexOf(startPosition)
+    println("NearPositions $nearPositions start $startPosition end $endPosition center $centerPosition")
+    var tmp: Int
+    var isCorrect = true
+    var current = startInNearPosition
+    for (i in nearPositions.indices) {
+        if (current <= 0) current = nearPositions.size
+        current--
+        tmp = nearPositions[current]
+        if (isIllegalIndex(tmp, matrix) || listWithReadyPosition[tmp]) {
+            isCorrect = false
+            break
+        }
+        result.add(tmp)
+        if (tmp == endPosition) break
+    }
+    if (!isCorrect) {
+        current = startInNearPosition
+        result.clear()
+        for (i in nearPositions.indices) {
+            current++
+            if (current == nearPositions.size) current = 0
+            tmp = nearPositions[current]
+//            if (tmp == startPosition) continue // Был костыль. Не понял почему он лишний раз при непонятных обстоятельствах учитывает себя
+            result.add(tmp)
+            if (tmp == endPosition) break
+        }
+    }
+    println("Rotate $result")
+    return result
+}
+
+fun moveIfPossible( // Сторит тракторию, проверяет ее и идет к ней, иначе возвращет false
+    currentPosition: Int,// Позиция текущего выбранного элемента
+    targetPosition: Int,// Позиция куда следует перемстить выббранный элемент
+    voidPosition: Int,// Позиция нуля
+    listWithReadyPosition: Array<Boolean>,// Уже готовые позиции
+    log: MutableList<Int>,// Журнал действий
+    data: MutableMap<Int, Int>,// Копия данных матрицы которые будут менятся в процессе работы
+    matrix: Matrix<Int>// матрица, которую менять не следует, наверное.
+): Boolean {
+    var actualVoidPosition = voidPosition
+    var actualCurrentPosition = currentPosition
+    var actualTargetPosition = getGuidingPosition(actualCurrentPosition, targetPosition, matrix.width)
+
+    println("targetPosition == voidPosition $targetPosition $voidPosition")
+    if (targetPosition == voidPosition && isNear(currentPosition, voidPosition, matrix)) {
+        simpleMove(actualCurrentPosition, actualVoidPosition, log, data)
+        return true
+    }
+
+    var trajectory = getTrajectory(
+        actualCurrentPosition,
+        actualTargetPosition,
+        actualVoidPosition,
+        listWithReadyPosition,
+        matrix
+    )
+
+    if (trajectory.isEmpty()) {
+        return if (targetPosition != actualCurrentPosition) {
+            unNamedMove(
+                targetPosition,
+                matrix,
+                actualCurrentPosition,
+                actualVoidPosition,
+                listWithReadyPosition,
+                log, data
+            )
+            true
+        } else {
+            false
+        }
+    }
+
+    while (trajectory.isNotEmpty()) {
+        actualVoidPosition = moveVoidTo(trajectory, actualVoidPosition, log, data) // Доводит до current
+        val tmp = actualVoidPosition
+        actualVoidPosition =
+            simpleMove(actualCurrentPosition, actualVoidPosition, log, data) // меняет местами с current
+
+        actualCurrentPosition = tmp
+        actualTargetPosition = getGuidingPosition(actualCurrentPosition, targetPosition, matrix.width)
+//        println("start $actualVoidPosition center $actualCurrentPosition end $actualTargetPosition")
+        trajectory = getTrajectory(
+            actualCurrentPosition,
+            actualTargetPosition, actualVoidPosition,
+            listWithReadyPosition, matrix
+        )
+        println("data $data")
+    }
+    if (actualTargetPosition != actualCurrentPosition) {
+        unNamedMove(
+            targetPosition,
+            matrix,
+            actualCurrentPosition,
+            actualVoidPosition,
+            listWithReadyPosition,
+            log, data
+        )
+    }
+    return true
+}
+
+fun isNear(currentPosition: Int, center: Int, matrix: Matrix<Int>): Boolean {
+    return getNeighbors(center, matrix.width, matrix.height).contains(currentPosition)
+}
+
+private fun unNamedMove(
+    targetPosition: Int,
+    matrix: Matrix<Int>,
+    currentPosition: Int,
+    voidPosition: Int,
+    listWithReadyPosition: Array<Boolean>,
+    log: MutableList<Int>,
+    data: MutableMap<Int, Int>
+) {
+    println("unNamedMove")
+    println("voidPosition $voidPosition targetPosition $targetPosition currentPosition $currentPosition")
+    // Крайняя ячейка для которой необходим спец прием
+    var actualCurrentPosition = currentPosition
+    var trajectory: List<Int>
+    var actualVoidPosition = voidPosition
+    val targetCell = toCell(targetPosition, matrix.width)
+    val currentCell = toCell(actualCurrentPosition, matrix.width)
+    val isVertical = targetCell.column == currentCell.column
+
+    // Должен довести до current
+    trajectory = if (!isVertical) {// Горизонталь
+        getTrajectory(
+            actualCurrentPosition,
+            toIndex(Cell(currentCell.row, currentCell.column + 1), matrix.width),
+            actualVoidPosition,
+            listWithReadyPosition, matrix
+        )
+    } else {// Вертикаль
+        getTrajectory(
+            actualCurrentPosition,
+            toIndex(Cell(currentCell.row + 1, currentCell.column), matrix.width),
+            actualVoidPosition,
+            listWithReadyPosition, matrix
+        )
+    }
+
+    actualVoidPosition = moveVoidTo(trajectory, actualVoidPosition, log, data)
+    var tmp = actualVoidPosition
+    if (trajectory.isNotEmpty())actualVoidPosition = simpleMove(actualCurrentPosition, actualVoidPosition, log, data)
+    println("data1 $data")
+
+    actualVoidPosition = rotateFourCells(actualVoidPosition, isVertical, 1, matrix.width, log, data)
+    println("rotate4 $data")
+    actualCurrentPosition = tmp
+    tmp = actualVoidPosition
+    actualVoidPosition = simpleMove(actualCurrentPosition, actualVoidPosition, log, data)
+    actualCurrentPosition = tmp
+    listWithReadyPosition[targetPosition - 1] = false
+
+    trajectory = if (!isVertical) {// Горизонталь
+        getTrajectory(
+            actualCurrentPosition,
+            toIndex(Cell(currentCell.row - 1, targetCell.column), matrix.width),
+            actualVoidPosition,
+            listWithReadyPosition, matrix
+        )
+    } else {// Вертикаль
+        getTrajectory(
+            actualCurrentPosition,
+            toIndex(Cell(targetCell.row, currentCell.column - 1), matrix.width),
+            actualVoidPosition,
+            listWithReadyPosition, matrix
+        )
+    }
+    actualVoidPosition = moveVoidTo(trajectory, actualVoidPosition, log, data)
+//    println("data2 $data")
+    actualVoidPosition = if (targetCell.row == currentCell.row) {
+        simpleMove(actualCurrentPosition - 1, actualVoidPosition, log, data)
+    } else {
+        simpleMove(actualCurrentPosition - matrix.width, actualVoidPosition, log, data)
+    }
+//    println("data3 $data")
+    simpleMove(actualCurrentPosition, actualVoidPosition, log, data)
+//    println("data4 $data")
+    listWithReadyPosition[targetPosition - 1] = true
+}
+
+fun rotateFourCells(
+    voidPosition: Int,
+    isCounterclockwise: Boolean,
+    countRotates: Int,
+    width: Int,
+    log: MutableList<Int>,
+    data: MutableMap<Int, Int>
+): Int {
+
+    val top = voidPosition - width
+    val tLeft = top - 1
+    val left = voidPosition - 1
+    val list =
+        if (isCounterclockwise) listOf(top, tLeft, left, voidPosition) else listOf(left, tLeft, top, voidPosition)
+    println("rotateFourCells $list")
+    var actualVoidPosition = voidPosition
+    for (i in 0 until list.size * countRotates) {
+        actualVoidPosition = simpleMove(list[i], actualVoidPosition, log, data)
+    }
+    return actualVoidPosition
+}
+
+fun getGuidingPosition(currentPosition: Int, targetPosition: Int, width: Int): Int {
+    val targetCell = toCell(targetPosition, width)
+    val currentCell = toCell(currentPosition, width)
+    val deltaColumn = targetCell.column - currentCell.column
+    val deltaRow = targetCell.row - currentCell.row
+
+    if (deltaColumn == 0 && deltaRow == 0) return targetPosition
+
+    if (deltaColumn == 0) return currentPosition + deltaRow / abs(deltaRow) * width
+
+    return currentPosition + deltaColumn / abs(deltaColumn)
+}
+
+fun moveVoidTo(
+    // Выполняет всю траеторию
+    trajectoryMove: List<Int>,
+    voidPosition: Int,
+    log: MutableList<Int>,
+    data: MutableMap<Int, Int>,
+): Int {// Возвращает позицию нуля
+    var actualVoidPosition = voidPosition
+    if (trajectoryMove.isEmpty()) println("IsEmptyTrajectory")
+    for (target in trajectoryMove) {
+        actualVoidPosition = simpleMove(target, actualVoidPosition, log, data)
+    }
+    return actualVoidPosition
+}
+
+fun getTrajectory( // Возращает позиции, по которым должен пройти ноль
+    currentPosition: Int,
+    targetPosition: Int,
+    voidPosition: Int,
+    listWithReadyPosition: Array<Boolean>,
+    matrix: Matrix<Int>
+): List<Int> {
+    val result = mutableListOf<Int>()
+    if (currentPosition == targetPosition) return result
+
+    val currentCell = toCell(currentPosition, matrix.height)
+    val targetCell = toCell(targetPosition, matrix.height)
+    val voidCell = toCell(voidPosition, matrix.height)
+
+    var rowDelta = targetCell.row - voidCell.row
+    var columnDelta = targetCell.column - voidCell.column
+    // проверка - на замкнутость конечной позиции
+    var count = 0
+    for (i in getNeighbors(targetPosition, matrix.width, matrix.height)) {
+        if (isIllegalIndex(i, matrix)) {
+            count++
+        } else if (listWithReadyPosition[i]) {
+            count++
+        }
+    }
+    if (count >= 3) {
+        println("count $count + target $targetPosition")
+        return result
+    } // это случай для приема №3
+
+    var actualVoidPosition = voidPosition
+
+    // Стандартная реализация
+    if ((rowDelta != 0 &&
+                ((targetCell.column == voidCell.column && targetCell.column == currentCell.column) /*&& (targetCell.row == currentCell.row && targetCell.row == voidCell.row)*/)) ||
+        (columnDelta != 0 &&
+                ((targetCell.row == voidCell.row && targetCell.row == currentCell.row) /*&& (targetCell.column == currentCell.column && targetCell.column == voidCell.column)*/))
+    ) {
+        rowDelta = targetCell.row - currentCell.row
+        columnDelta = targetCell.column - currentCell.column
+        // Довожу до радиуса вокруг выбранной точки
+        for (i in 1 until abs(rowDelta)) {
+            actualVoidPosition += rowDelta / abs(rowDelta) * matrix.width
+            result.add(actualVoidPosition)
+            rowDelta += if (rowDelta > 0) -1 else 1 // уменьшаю дельту
+        }
+        for (i in 1 until abs(columnDelta)) {
+            actualVoidPosition += columnDelta / abs(columnDelta)
+            result.add(actualVoidPosition)
+            columnDelta += if (columnDelta > 0) -1 else 1 // уменьшаю дельту
+        }
+        result.addAll(
+            rotateTrajectory(
+                actualVoidPosition, targetPosition,
+                currentPosition, listWithReadyPosition, matrix
+            )
+        )
+
+    } else {
+
+        println("voidPosition $voidPosition columnDelta $columnDelta rowDelta $rowDelta currentPosition $currentPosition")
+        if (voidPosition + columnDelta == currentPosition && abs(rowDelta) > 0) { // Если Void и Current на одной строке
+            actualVoidPosition += rowDelta / abs(rowDelta) * matrix.width
+            result.add(actualVoidPosition) // Сперва поднимаю на 1 клетку (кейса, где нужно опускать на 1 клетку в ст. реализации нет)
+            rowDelta += if (rowDelta > 0) -1 else 1 // уменьшаю дельту
+        }
+        var isCorrectWay = true
+        for (i in 0 until abs(columnDelta)) {
+            val index = actualVoidPosition + (i + 1) * columnDelta / abs(columnDelta)
+            if (listWithReadyPosition[index] || index == currentPosition) {
+                isCorrectWay = false
+                break
+            }
+        }
+        println("isCorrectWay $isCorrectWay")
+        if (!isCorrectWay) {
+            for (i in 0 until abs(rowDelta)) {
+                actualVoidPosition += rowDelta / abs(rowDelta) * matrix.width
+                result.add(actualVoidPosition)
+            }
+            for (i in 0 until abs(columnDelta)) {
+                actualVoidPosition += columnDelta / abs(columnDelta)
+                result.add(actualVoidPosition)
+
+            }
+        } else {
+            for (i in 0 until abs(columnDelta)) {
+                actualVoidPosition += columnDelta / abs(columnDelta)
+                result.add(actualVoidPosition)
+
+            }
+            for (i in 0 until abs(rowDelta)) {
+                actualVoidPosition += rowDelta / abs(rowDelta) * matrix.width
+                result.add(actualVoidPosition)
+            }
+        }
+    }
+    println("Trajectory $result")
+    return result
+}
+
+fun simpleMove( // Передвижение на 1 клетку
+    targetPosition: Int,
+    voidPosition: Int,
+    log: MutableList<Int>?,
+    data: MutableMap<Int, Int>
+): Int { // Возвращает позицию нуля
+//    println("targetPosition $targetPosition")
+    val tmp = data[targetPosition]!!
+    data[targetPosition] = 0
+    data[voidPosition] = tmp
+    println("target $targetPosition targetValue $tmp void $voidPosition")
+    log?.add(tmp)
+    return targetPosition
+}
+
+fun getNearPosition(center: Int, width: Int): List<Int> {
+    val top = center - width
+    val bottom = center + width
+    return listOf(top - 1, top, top + 1, center + 1, bottom + 1, bottom, bottom - 1, center - 1)
 }
