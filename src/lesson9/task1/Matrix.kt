@@ -113,7 +113,7 @@ class MatrixImpl<E>(override val width: Int, override val height: Int) : Matrix<
         if ((other as? Matrix<*>) != null) {
             if (width != other.width || height != other.height) return false
             for ((i, v) in data) {
-                if (other[toCell(i,other.height)] != v) return false
+                if (other[toCell(i, other.height)] != v) return false
             }
         }
         return true

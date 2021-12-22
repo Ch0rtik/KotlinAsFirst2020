@@ -269,7 +269,7 @@ fun fifteenGameMoves(matrix: Matrix<Int>, moves: List<Int>): Matrix<Int> {
             println(moves)
             throw IllegalArgumentException("$it")
         }
-        voidPosition = simpleMove(currentIndex, voidPosition, null, matrix.get())
+        voidPosition = simpleMove(currentIndex, voidPosition, null, matrix)
     }
     return matrix
 }
@@ -381,6 +381,7 @@ fun main() {
 }
 
 fun fifteenGameSolution(matrix: Matrix<Int>): List<Int> {
+    TODO()
     // По большей части я использовал след. приемы для решения головоломки:
     // 1) вращение окружающих цифр для прохода текущей цифры к своему месту;
     // 2) перемещения нуля к текущей цифре, в зону его радиуса (3х3);
@@ -841,7 +842,22 @@ fun simpleMove( // Передвижение на 1 клетку
     val tmp = data[targetPosition]!!
     data[targetPosition] = 0
     data[voidPosition] = tmp
-    println("target $targetPosition targetValue $tmp void $voidPosition")
+//    println("target $targetPosition targetValue $tmp void $voidPosition")
+    log?.add(tmp)
+    return targetPosition
+}
+
+fun simpleMove( // Передвижение на 1 клетку
+    targetPosition: Int,
+    voidPosition: Int,
+    log: MutableList<Int>?,
+    matrix: Matrix<Int>
+): Int { // Возвращает позицию нуля
+//    println("targetPosition $targetPosition")
+    val tmp = matrix[toCell(targetPosition, matrix.height)]!!
+    matrix[toCell(targetPosition, matrix.height)] = 0
+    matrix[toCell(voidPosition, matrix.height)] = tmp
+//    println("target $targetPosition targetValue $tmp void $voidPosition")
     log?.add(tmp)
     return targetPosition
 }
