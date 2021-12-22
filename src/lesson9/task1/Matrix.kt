@@ -29,10 +29,6 @@ interface Matrix<E> {
 
     operator fun get(cell: Cell): E
 
-    operator fun get(index: Int): E
-
-    fun get(): MutableMap<Int,E>
-
     /**
      * Запись в ячейку.
      * Методы могут бросить исключение, если ячейка не существует
@@ -97,13 +93,9 @@ class MatrixImpl<E>(override val width: Int, override val height: Int) : Matrix<
         return get(cell.row, cell.column)
     }
 
-    override fun get(index: Int): E {
+    fun get(index: Int): E {
         if ((index >= width * height || index < 0)) throw IllegalArgumentException("The index $index not exist")
         return data[index]!!
-    }
-
-    override fun get(): MutableMap<Int, E> {
-        return data
     }
 
     override fun set(row: Int, column: Int, value: E) {
@@ -121,7 +113,7 @@ class MatrixImpl<E>(override val width: Int, override val height: Int) : Matrix<
         if ((other as? Matrix<*>) != null) {
             if (width != other.width || height != other.height) return false
             for ((i, v) in data) {
-                if (other[i] != v) return false
+                if (other[toCell(i,other.height)] != v) return false
             }
         }
         return true

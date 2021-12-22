@@ -292,7 +292,7 @@ fun getIndexToValue(currentIndex: Int, value: Int, matrix: Matrix<Int>): Int {
     for (index in ways) {
         if (isIllegalIndex(index, matrix)) continue
 
-        if (matrix[index] == value)
+        if (matrix[toCell(index, matrix.height)] == value)
             return index
     }
 
@@ -358,6 +358,14 @@ fun <E> createMatrix(height: Int, width: Int, values: List<List<E>>): Matrix<E> 
         }
     }
     return matrix
+}
+
+fun Matrix<Int>.get(): MutableMap<Int, Int> {
+    val data = mutableMapOf<Int, Int>()
+    for (i in 0 until height * width) {
+        data[i] = this[toCell(i, height)]
+    }
+    return data
 }
 
 fun main() {
@@ -446,7 +454,7 @@ fun isCorrectVariant(matrix: Matrix<Int>, zeroRow: Int): Boolean {
     val end = matrix.height * matrix.width
     for (i in 0 until end) {
         for (j in i + 1 until end - 1) {
-            if (matrix[i] > matrix[i + 1]) {
+            if (matrix[toCell(i, matrix.height)] > matrix[toCell(i + 1, matrix.height)]) {
                 sum++
             }
         }
