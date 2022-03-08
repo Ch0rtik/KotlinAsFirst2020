@@ -18,7 +18,7 @@ git add remotes <br>
 git commit -m "Remotes" <br>
 git add howto <br>
 git commit -m "Howto" <br>
-git push
+git push <br>
 <br>
 git checkout backport <br>
 git push -u origin backport 
