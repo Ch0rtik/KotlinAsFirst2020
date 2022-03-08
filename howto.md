@@ -16,8 +16,9 @@ git merge -s ours upstream-theirs/master (самое простое решени
 git remote -v > remotes <br>
 git add remotes <br>
 git commit -m "Remotes" <br>
-git add remotes <br>
+git add howto <br>
 git commit -m "Howto" <br>
+git push
 <br>
 git checkout backport <br>
 git push -u origin backport 
